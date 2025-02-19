@@ -49,7 +49,7 @@ const OrdersList = () => {
     return (
       <Container sx={{ mt: 4 }}>
         <Typography variant="h5" gutterBottom>
-          Órdenes del proyecto
+          Ordenes del proyecto
         </Typography>
         <List>
           {orders.map((order) => (
