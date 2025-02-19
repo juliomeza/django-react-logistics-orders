@@ -20,7 +20,7 @@ To use this project as a starting point for your own application:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/juliomeza/django-react-postgres.git your-project-name
+git clone git@github.com:juliomeza/django-react-logistics-orders.git your-project-name
 ```
 
 2. Move into your project directory:
@@ -32,6 +32,32 @@ cd your-project-name
 ```bash
 rm -rf .git
 git init
+```
+
+4. Remove the previous remote origin (if any):
+```bash
+git remote remove origin
+```
+
+5. Add the new remote repository:
+```bash
+git remote add origin git@github.com:juliomeza/your-project-name.git
+```
+
+6. Verify the remote repository is correctly set:
+```bash
+git remote -v
+```
+
+7. Make your first commit (optional, if you modified files):
+```bash
+git add .
+git commit -m "First commit"
+```
+
+8. Push the changes to the new repository:
+```bash
+git push -u origin main
 ```
 
 ## Backend Setup
