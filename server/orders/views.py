@@ -15,10 +15,6 @@ class OrderTypeViewSet(viewsets.ModelViewSet):
     queryset = OrderType.objects.all()
     serializer_class = OrderTypeSerializer
 
-# class OrderViewSet(viewsets.ModelViewSet):
-#     queryset = Order.objects.all()
-#     serializer_class = OrderSerializer
-
 class OrderViewSet(viewsets.ModelViewSet):
     # Agregamos un queryset por defecto para que el router pueda determinar el basename
     queryset = Order.objects.all()

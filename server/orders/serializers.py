@@ -12,6 +12,7 @@ class OrderTypeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class OrderSerializer(serializers.ModelSerializer):
+    order_status_name = serializers.CharField(source='order_status.status_name', read_only=True)
     class Meta:
         model = Order
         fields = '__all__'

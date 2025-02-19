@@ -55,8 +55,8 @@ const OrdersList = () => {
           {orders.map((order) => (
             <ListItem key={order.id}>
               <ListItemText
-                primary={`Orden: ${order.lookup_code_order}`}
-                secondary={`Estado: ${order.order_status}`}
+                primary={`Order: ${order.lookup_code_order}`}
+                secondary={`Status: ${order.order_status_name}`}
               />
             </ListItem>
           ))}
