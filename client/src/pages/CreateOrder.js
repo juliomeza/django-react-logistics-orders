@@ -10,13 +10,14 @@ const CreateOrder = () => {
   const [error, setError] = useState('');
 
   // Opciones para los dropdowns
+  const [warehouses, setWarehouses] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [orderTypes, setOrderTypes] = useState([]);
   const [orderClasses, setOrderClasses] = useState([]);
-  const [projects, setProjects] = useState([]);
-  const [warehouses, setWarehouses] = useState([]);
+  const [carriers, setCarriers] = useState([]);
   const [contacts, setContacts] = useState([]);
   const [addresses, setAddresses] = useState([]);
-  const [carriers, setCarriers] = useState([]);
+  
 
   // Estado del formulario
   const [formData, setFormData] = useState({
@@ -114,46 +115,6 @@ const CreateOrder = () => {
         onSubmit={handleSubmit}
         sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
       >
-        {/* Lookup Code Order */}
-        <TextField
-          label="Lookup Code Order"
-          name="lookup_code_order"
-          value={formData.lookup_code_order}
-          onChange={handleChange}
-          inputProps={{ maxLength: 50, minLength: 1 }}
-          fullWidth
-          required
-        />
-        {/* Lookup Code Shipment */}
-        <TextField
-          label="Lookup Code Shipment"
-          name="lookup_code_shipment"
-          value={formData.lookup_code_shipment}
-          onChange={handleChange}
-          inputProps={{ maxLength: 50, minLength: 1 }}
-          fullWidth
-          required
-        />
-        {/* Expected Delivery Date */}
-        <TextField
-          label="Expected Delivery Date"
-          name="expected_delivery_date"
-          type="datetime-local"
-          value={formData.expected_delivery_date}
-          onChange={handleChange}
-          InputLabelProps={{ shrink: true }}
-          fullWidth
-        />
-        {/* Notes */}
-        <TextField
-          label="Notes"
-          name="notes"
-          value={formData.notes}
-          onChange={handleChange}
-          multiline
-          rows={3}
-          fullWidth
-        />
         {/* Order Type */}
         <TextField
           select
@@ -196,22 +157,26 @@ const CreateOrder = () => {
           fullWidth
           required
         />
-        {/* Project */}
+        {/* Lookup Code Order */}
         <TextField
-          select
-          label="Project"
-          name="project"
-          value={formData.project}
+          label="Lookup Code Order"
+          name="lookup_code_order"
+          value={formData.lookup_code_order}
           onChange={handleChange}
+          inputProps={{ maxLength: 50, minLength: 1 }}
           fullWidth
           required
-        >
-          {projects.map((project) => (
-            <MenuItem key={project.id} value={project.id}>
-              {project.name}
-            </MenuItem>
-          ))}
-        </TextField>
+        />
+        {/* Lookup Code Shipment */}
+        <TextField
+          label="Lookup Code Shipment"
+          name="lookup_code_shipment"
+          value={formData.lookup_code_shipment}
+          onChange={handleChange}
+          inputProps={{ maxLength: 50, minLength: 1 }}
+          fullWidth
+          required
+        />
         {/* Warehouse */}
         <TextField
           select
@@ -228,6 +193,56 @@ const CreateOrder = () => {
             </MenuItem>
           ))}
         </TextField>
+        {/* Project */}
+        <TextField
+          select
+          label="Project"
+          name="project"
+          value={formData.project}
+          onChange={handleChange}
+          fullWidth
+          required
+        >
+          {projects.map((project) => (
+            <MenuItem key={project.id} value={project.id}>
+              {project.name}
+            </MenuItem>
+          ))}
+        </TextField>
+        {/* Carrier (opcional) */}
+        <TextField
+          select
+          label="Carrier"
+          name="carrier"
+          value={formData.carrier}
+          onChange={handleChange}
+          fullWidth
+        >
+          {carriers.map((carrier) => (
+            <MenuItem key={carrier.id} value={carrier.id}>
+              {carrier.name}
+            </MenuItem>
+          ))}
+        </TextField>
+        {/* Service Type (opcional) */}
+        <TextField
+          label="Service Type"
+          name="service_type"
+          type="number"
+          value={formData.service_type}
+          onChange={handleChange}
+          fullWidth
+        />
+        {/* Expected Delivery Date */}
+        <TextField
+          label="Expected Delivery Date"
+          name="expected_delivery_date"
+          type="datetime-local"
+          value={formData.expected_delivery_date}
+          onChange={handleChange}
+          InputLabelProps={{ shrink: true }}
+          fullWidth
+        />
         {/* Contact */}
         <TextField
           select
@@ -276,33 +291,21 @@ const CreateOrder = () => {
             </MenuItem>
           ))}
         </TextField>
-        {/* Carrier (opcional) */}
+        {/* Notes */}
         <TextField
-          select
-          label="Carrier"
-          name="carrier"
-          value={formData.carrier}
+          label="Notes"
+          name="notes"
+          value={formData.notes}
           onChange={handleChange}
-          fullWidth
-        >
-          {carriers.map((carrier) => (
-            <MenuItem key={carrier.id} value={carrier.id}>
-              {carrier.name}
-            </MenuItem>
-          ))}
-        </TextField>
-        {/* Service Type (opcional) */}
-        <TextField
-          label="Service Type"
-          name="service_type"
-          type="number"
-          value={formData.service_type}
-          onChange={handleChange}
+          multiline
+          rows={3}
           fullWidth
         />
+        
         <Button type="submit" variant="contained" color="primary">
           Enviar Orden
         </Button>
+      
       </Box>
     </Container>
   );
