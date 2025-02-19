@@ -1,11 +1,12 @@
 import { useContext } from 'react';
 import { Container, Typography, Button, CircularProgress } from '@mui/material';
 import AuthContext from '../context/AuthContext';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import OrdersList from './OrdersList';
 
 const SecurePage = () => {
   const { user, logout, loading } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   if (loading) {
     return (
@@ -22,6 +23,10 @@ const SecurePage = () => {
     return <Navigate to="/login" />;
   }
 
+  const handleCreateOrder = () => {
+    navigate('/create-order');
+  };
+
   return (
     <Container maxWidth="sm" sx={{ textAlign: 'center', mt: 4 }}>
       <Typography variant="h4" gutterBottom>
@@ -31,7 +36,10 @@ const SecurePage = () => {
         Welcome, {user?.first_name}!
       </Typography>
       
-      {/* Mostramos las órdenes filtradas por proyecto */}
+      <Button variant="contained" color="primary" onClick={handleCreateOrder} sx={{ mb: 2 }}>
+        Create Order
+      </Button>
+
       <OrdersList />
 
       <Button variant="contained" color="secondary" onClick={logout} sx={{ mt: 4 }}>
