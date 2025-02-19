@@ -33,7 +33,7 @@ const OrdersList = () => {
       return (
         <Container sx={{ textAlign: 'center', mt: 4 }}>
           <CircularProgress />
-          <Typography mt={2}>Cargando órdenes...</Typography>
+          <Typography mt={2}>Loading orders...</Typography>
         </Container>
       );
     }
@@ -49,7 +49,7 @@ const OrdersList = () => {
     return (
       <Container sx={{ mt: 4 }}>
         <Typography variant="h5" gutterBottom>
-          Ordenes del proyecto
+          Open Orders
         </Typography>
         <List>
           {orders.map((order) => (

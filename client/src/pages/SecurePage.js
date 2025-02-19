@@ -12,7 +12,7 @@ const SecurePage = () => {
       <Container maxWidth="sm" sx={{ textAlign: 'center', mt: 4 }}>
         <CircularProgress />
         <Typography variant="h6" mt={2}>
-          Cargando...
+          Loading...
         </Typography>
       </Container>
     );
@@ -28,7 +28,7 @@ const SecurePage = () => {
         Secure Page
       </Typography>
       <Typography variant="h6" gutterBottom>
-        Bienvenido, {user?.first_name}!
+        Welcome, {user?.first_name}!
       </Typography>
       
       {/* Mostramos las órdenes filtradas por proyecto */}
