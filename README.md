@@ -41,7 +41,7 @@ git remote remove origin
 
 5. Add the new remote repository:
 ```bash
-git remote add origin git@github.com:juliomeza/your-project-name.git
+git remote add origin git@github.com:your-github-username/your-project-name.git
 ```
 
 6. Verify the remote repository is correctly set:
