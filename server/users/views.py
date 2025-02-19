@@ -5,6 +5,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.http import JsonResponse
+from .serializers import CustomUserSerializer
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
@@ -68,10 +69,19 @@ class LogoutView(APIView):
         response.delete_cookie('refresh_token')
         return response
 
+# class AuthStatusView(APIView):
+#     # No forzamos permisos aquí para que, en caso de token inválido, request.user sea Anonymous
+#     def get(self, request):
+#         user = request.user
+#         if user and user.is_authenticated:
+#             return Response({'user': {'first_name': user.first_name, 'last_name': user.last_name}}, status=status.HTTP_200_OK)
+#         return Response({'user': None}, status=status.HTTP_200_OK)
+
 class AuthStatusView(APIView):
-    # No forzamos permisos aquí para que, en caso de token inválido, request.user sea Anonymous
+    # No forzamos permisos para que, en caso de token inválido, request.user sea Anonymous
     def get(self, request):
         user = request.user
         if user and user.is_authenticated:
-            return Response({'user': {'first_name': user.first_name, 'last_name': user.last_name}}, status=status.HTTP_200_OK)
+            serializer = CustomUserSerializer(user)
+            return Response({'user': serializer.data}, status=status.HTTP_200_OK)
         return Response({'user': None}, status=status.HTTP_200_OK)
