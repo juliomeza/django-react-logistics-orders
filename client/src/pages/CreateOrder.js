@@ -36,7 +36,6 @@ const CreateOrder = () => {
     service_type: '',
   });
 
-  // Carga de datos para dropdowns usando los endpoints definidos en swagger.json
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -57,11 +56,17 @@ const CreateOrder = () => {
           axios.get('http://localhost:8000/api/addresses/', { withCredentials: true }),
           axios.get('http://localhost:8000/api/carriers/', { withCredentials: true }),
         ]);
+
         setOrderTypes(orderTypesRes.data);
         setOrderClasses(orderClassesRes.data);
-        // Filtramos los proyectos para mostrar solo los que tienen al usuario en su propiedad "users"
+        // Filtramos los proyectos para mostrar solo los que tengan al usuario en su propiedad "users"
         if (user && user.id) {
-          setProjects(projectsRes.data.filter((proj) => proj.users.includes(user.id)));
+          const userId = parseInt(user.id, 10);
+          setProjects(
+            projectsRes.data.filter((proj) =>
+              Array.isArray(proj.users) && proj.users.includes(userId)
+            )
+          );
         } else {
           setProjects(projectsRes.data);
         }
@@ -76,7 +81,6 @@ const CreateOrder = () => {
     fetchData();
   }, [user]);
 
-  // Maneja los cambios en los inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -85,7 +89,6 @@ const CreateOrder = () => {
     }));
   };
 
-  // Envía el formulario al endpoint de creación de órdenes
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -106,7 +109,11 @@ const CreateOrder = () => {
           {error}
         </Typography>
       )}
-      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+      >
         {/* Lookup Code Order */}
         <TextField
           label="Lookup Code Order"
@@ -134,9 +141,7 @@ const CreateOrder = () => {
           type="datetime-local"
           value={formData.expected_delivery_date}
           onChange={handleChange}
-          InputLabelProps={{
-            shrink: true,
-          }}
+          InputLabelProps={{ shrink: true }}
           fullWidth
         />
         {/* Notes */}
@@ -191,7 +196,7 @@ const CreateOrder = () => {
           fullWidth
           required
         />
-        {/* Project - se muestran solo los proyectos a los que el usuario tiene acceso */}
+        {/* Project */}
         <TextField
           select
           label="Project"
