@@ -163,7 +163,7 @@ const CreateOrder = () => {
               name="lookup_code_order"
               value={formData.lookup_code_order}
               onChange={handleChange}
-              inputProps={{ maxLength: 50, minLength: 1 }}
+              slotProps={{ htmlInput: { maxLength: 50, minLength: 1 } }}
               fullWidth
               required
             />
@@ -174,7 +174,7 @@ const CreateOrder = () => {
               name="lookup_code_shipment"
               value={formData.lookup_code_shipment}
               onChange={handleChange}
-              inputProps={{ maxLength: 50, minLength: 1 }}
+              slotProps={{ htmlInput: { maxLength: 50, minLength: 1 } }}
               fullWidth
               required
             />
@@ -229,10 +229,10 @@ const CreateOrder = () => {
             <TextField
               label="Expected Delivery Date"
               name="expected_delivery_date"
-              type="datetime-local"
+              type="date"
               value={formData.expected_delivery_date}
               onChange={handleChange}
-              InputLabelProps={{ shrink: true }}
+              slotProps={{ inputLabel: { shrink: true } }}
               fullWidth
             />
           </Grid>
