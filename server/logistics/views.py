@@ -20,9 +20,25 @@ class WarehouseViewSet(viewsets.ModelViewSet):
     queryset = Warehouse.objects.all()
     serializer_class = WarehouseSerializer
 
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return Warehouse.objects.none()
+        
+        user_projects = self.request.user.projects.all()
+        # Se filtran los warehouses que están asociados a los proyectos del usuario
+        return Warehouse.objects.filter(projects__in=user_projects).distinct()
+
 class CarrierViewSet(viewsets.ModelViewSet):
     queryset = Carrier.objects.all()
     serializer_class = CarrierSerializer
+
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return Carrier.objects.none()
+        
+        user_projects = self.request.user.projects.all()
+        # Se filtran los carriers que están asociados a los proyectos del usuario
+        return Carrier.objects.filter(projects__in=user_projects).distinct()
 
 class CarrierServiceViewSet(viewsets.ModelViewSet):
     queryset = CarrierService.objects.all()
