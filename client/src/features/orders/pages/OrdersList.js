@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Container, Typography, List, ListItem, ListItemText, CircularProgress } from '@mui/material';
 import axios from 'axios';
-import AuthContext from '../features/auth/AuthContext';
+import AuthContext from '../../auth/AuthContext';
 
 const OrdersList = () => {
     const { user } = useContext(AuthContext);
