@@ -15,6 +15,7 @@ const CreateOrder = () => {
   const [projects, setProjects] = useState([]);
   const [orderTypes, setOrderTypes] = useState([]);
   const [orderClasses, setOrderClasses] = useState([]);
+  const [orderStatuses, setOrderStatuses] = useState([]); // Nuevo
   const [carriers, setCarriers] = useState([]);
   const [carrierServices, setCarrierServices] = useState([]);
   const [contacts, setContacts] = useState([]);
@@ -41,6 +42,7 @@ const CreateOrder = () => {
     const fetchData = async () => {
       try {
         const [
+          orderStatusesRes,
           orderTypesRes,
           orderClassesRes,
           projectsRes,
@@ -50,6 +52,7 @@ const CreateOrder = () => {
           carriersRes,
           carrierServicesRes,
         ] = await Promise.all([
+          apiProtected.get('order-statuses/'),
           apiProtected.get('order-types/'),
           apiProtected.get('order-classes/'),
           apiProtected.get('projects/'),
@@ -60,6 +63,7 @@ const CreateOrder = () => {
           apiProtected.get('carrier-services/'),
         ]);
 
+        setOrderStatuses(orderStatusesRes.data);
         setOrderTypes(orderTypesRes.data);
         setOrderClasses(orderClassesRes.data);
 
@@ -147,14 +151,15 @@ const CreateOrder = () => {
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField
+            <SelectField
               label="Order Status"
               name="order_status"
-              type="number"
               value={formData.order_status}
               onChange={handleChange}
-              fullWidth
               required
+              options={orderStatuses}
+              getOptionLabel={(option) => option.status_name}
+              getOptionValue={(option) => option.id}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
