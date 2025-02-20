@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react';
 import { TextField, Button, Container, Typography, Box } from '@mui/material';
-import AuthContext from '../context/AuthContext';
+import AuthContext from './AuthContext';
 
 const Login = () => {
   const [credentials, setCredentials] = useState({ email: '', password: '' });

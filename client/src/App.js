@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import Login from './pages/Login';
+import { AuthProvider } from './features/auth/AuthContext';
+import Login from './features/auth/Login';
 import SecurePage from './pages/SecurePage';
 import CreateOrder from './pages/CreateOrder';
 

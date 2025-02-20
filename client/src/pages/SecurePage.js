@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { Container, Typography, Button, CircularProgress } from '@mui/material';
-import AuthContext from '../context/AuthContext';
+import AuthContext from '../features/auth/AuthContext';
 import { Navigate, useNavigate } from 'react-router-dom';
 import OrdersList from './OrdersList';
 
