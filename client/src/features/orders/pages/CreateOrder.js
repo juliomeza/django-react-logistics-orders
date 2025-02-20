@@ -1,12 +1,11 @@
-// CreateOrder.js
 import React, { useState, useEffect, useContext } from 'react';
-import { Container, Typography, TextField, Button, MenuItem, Box } from '@mui/material';
+import { Container, Typography, TextField, Button, Box } from '@mui/material';
 import { useNavigate, Navigate } from 'react-router-dom';
 import AuthContext from '../../auth/AuthContext';
 import apiProtected from '../../../services/api/secureApi';
+import SelectField from '../components/SelectField';
 
 const CreateOrder = () => {
-  // Llamamos a todos los hooks incondicionalmente
   const { user, loading } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -36,9 +35,8 @@ const CreateOrder = () => {
     service_type: '',
   });
 
-  // Siempre se llama a useEffect; dentro verificamos si hay usuario
   useEffect(() => {
-    if (!user) return; // Si no hay usuario, no hacemos la petición
+    if (!user) return;
     const fetchData = async () => {
       try {
         const [
@@ -87,24 +85,19 @@ const CreateOrder = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await apiProtected.post('orders/', formData);
-      navigate('/secure');
+      navigate('/dashboard');
     } catch (err) {
       setError('Error al crear la orden.');
     }
   };
 
-  // En el render: si está cargando, mostramos loading.
-  // Si ya terminó de cargar y no hay usuario, redirigimos a login.
   if (loading) {
     return (
       <Container sx={{ mt: 4 }}>
@@ -127,46 +120,29 @@ const CreateOrder = () => {
           {error}
         </Typography>
       )}
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
-        sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
-      >
-        {/* Order Type */}
-        <TextField
-          select
+      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <SelectField
           label="Order Type"
           name="order_type"
           value={formData.order_type}
           onChange={handleChange}
-          fullWidth
           required
-        >
-          {orderTypes.map((ot) => (
-            <MenuItem key={ot.id} value={ot.id}>
-              {ot.type_name}
-            </MenuItem>
-          ))}
-        </TextField>
+          options={orderTypes}
+          getOptionLabel={(option) => option.type_name}
+          getOptionValue={(option) => option.id}
+        />
 
-        {/* Order Class */}
-        <TextField
-          select
+        <SelectField
           label="Order Class"
           name="order_class"
           value={formData.order_class}
           onChange={handleChange}
-          fullWidth
           required
-        >
-          {orderClasses.map((oc) => (
-            <MenuItem key={oc.id} value={oc.id}>
-              {oc.class_name}
-            </MenuItem>
-          ))}
-        </TextField>
+          options={orderClasses}
+          getOptionLabel={(option) => option.class_name}
+          getOptionValue={(option) => option.id}
+        />
 
-        {/* Order Status */}
         <TextField
           label="Order Status"
           name="order_status"
@@ -177,7 +153,6 @@ const CreateOrder = () => {
           required
         />
 
-        {/* Lookup Code Order */}
         <TextField
           label="Lookup Code Order"
           name="lookup_code_order"
@@ -188,7 +163,6 @@ const CreateOrder = () => {
           required
         />
 
-        {/* Lookup Code Shipment */}
         <TextField
           label="Lookup Code Shipment"
           name="lookup_code_shipment"
@@ -199,73 +173,48 @@ const CreateOrder = () => {
           required
         />
 
-        {/* Warehouse */}
-        <TextField
-          select
+        <SelectField
           label="Warehouse"
           name="warehouse"
           value={formData.warehouse}
           onChange={handleChange}
-          fullWidth
           required
-        >
-          {warehouses.map((wh) => (
-            <MenuItem key={wh.id} value={wh.id}>
-              {wh.name}
-            </MenuItem>
-          ))}
-        </TextField>
+          options={warehouses}
+          getOptionLabel={(option) => option.name}
+          getOptionValue={(option) => option.id}
+        />
 
-        {/* Project */}
-        <TextField
-          select
+        <SelectField
           label="Project"
           name="project"
           value={formData.project}
           onChange={handleChange}
-          fullWidth
           required
-        >
-          {projects.map((project) => (
-            <MenuItem key={project.id} value={project.id}>
-              {project.name}
-            </MenuItem>
-          ))}
-        </TextField>
+          options={projects}
+          getOptionLabel={(option) => option.name}
+          getOptionValue={(option) => option.id}
+        />
 
-        {/* Carrier (opcional) */}
-        <TextField
-          select
+        <SelectField
           label="Carrier"
           name="carrier"
           value={formData.carrier}
           onChange={handleChange}
-          fullWidth
-        >
-          {carriers.map((carrier) => (
-            <MenuItem key={carrier.id} value={carrier.id}>
-              {carrier.name}
-            </MenuItem>
-          ))}
-        </TextField>
+          options={carriers}
+          getOptionLabel={(option) => option.name}
+          getOptionValue={(option) => option.id}
+        />
 
-        {/* Service Type (opcional) */}
-        <TextField
-          select
+        <SelectField
           label="Service Type"
           name="service_type"
           value={formData.service_type}
           onChange={handleChange}
-          fullWidth
-        >
-          {carrierServices.map((service) => (
-            <MenuItem key={service.id} value={service.id}>
-              {service.name}
-            </MenuItem>
-          ))}
-        </TextField>
+          options={carrierServices}
+          getOptionLabel={(option) => option.name}
+          getOptionValue={(option) => option.id}
+        />
 
-        {/* Expected Delivery Date */}
         <TextField
           label="Expected Delivery Date"
           name="expected_delivery_date"
@@ -276,58 +225,39 @@ const CreateOrder = () => {
           fullWidth
         />
 
-        {/* Contact */}
-        <TextField
-          select
+        <SelectField
           label="Contact"
           name="contact"
           value={formData.contact}
           onChange={handleChange}
-          fullWidth
           required
-        >
-          {contacts.map((contact) => (
-            <MenuItem key={contact.id} value={contact.id}>
-              {contact.first_name} {contact.last_name}
-            </MenuItem>
-          ))}
-        </TextField>
+          options={contacts}
+          getOptionLabel={(option) => `${option.first_name} ${option.last_name}`}
+          getOptionValue={(option) => option.id}
+        />
 
-        {/* Shipping Address */}
-        <TextField
-          select
+        <SelectField
           label="Shipping Address"
           name="shipping_address"
           value={formData.shipping_address}
           onChange={handleChange}
-          fullWidth
           required
-        >
-          {addresses.map((addr) => (
-            <MenuItem key={addr.id} value={addr.id}>
-              {addr.address_line_1}
-            </MenuItem>
-          ))}
-        </TextField>
+          options={addresses}
+          getOptionLabel={(option) => option.address_line_1}
+          getOptionValue={(option) => option.id}
+        />
 
-        {/* Billing Address */}
-        <TextField
-          select
+        <SelectField
           label="Billing Address"
           name="billing_address"
           value={formData.billing_address}
           onChange={handleChange}
-          fullWidth
           required
-        >
-          {addresses.map((addr) => (
-            <MenuItem key={addr.id} value={addr.id}>
-              {addr.address_line_1}
-            </MenuItem>
-          ))}
-        </TextField>
+          options={addresses}
+          getOptionLabel={(option) => option.address_line_1}
+          getOptionValue={(option) => option.id}
+        />
 
-        {/* Notes */}
         <TextField
           label="Notes"
           name="notes"
