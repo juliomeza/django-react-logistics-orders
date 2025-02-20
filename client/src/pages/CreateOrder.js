@@ -3,7 +3,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Container, Typography, TextField, Button, MenuItem, Box } from '@mui/material';
 import { useNavigate, Navigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
-import apiProtected from '../services/apiProtected';
+import apiProtected from '../services/api/secureApi';
 
 const CreateOrder = () => {
   // Llamamos a todos los hooks incondicionalmente

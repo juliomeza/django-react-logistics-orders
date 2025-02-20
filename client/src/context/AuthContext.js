@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api, { setupInterceptors } from '../services/apiService';
-import apiProtected from '../services/apiProtected';
+import api, { setupInterceptors } from '../services/api/authApi';
+import apiProtected from '../services/api/secureApi';
 
 const AuthContext = createContext();
 
