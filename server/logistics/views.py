@@ -16,6 +16,14 @@ class ContactViewSet(viewsets.ModelViewSet):
     queryset = Contact.objects.all()
     serializer_class = ContactSerializer
 
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return Contact.objects.none()
+        
+        user_projects = self.request.user.projects.all()
+        # Se filtran los contacts que están asociados a los proyectos del usuario
+        return Contact.objects.filter(projects__in=user_projects).distinct()
+
 class WarehouseViewSet(viewsets.ModelViewSet):
     queryset = Warehouse.objects.all()
     serializer_class = WarehouseSerializer
@@ -43,3 +51,11 @@ class CarrierViewSet(viewsets.ModelViewSet):
 class CarrierServiceViewSet(viewsets.ModelViewSet):
     queryset = CarrierService.objects.all()
     serializer_class = CarrierServiceSerializer
+
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return CarrierService.objects.none()
+        
+        user_projects = self.request.user.projects.all()
+        # Se filtran los carrier services que están asociados a los proyectos del usuario
+        return CarrierService.objects.filter(projects__in=user_projects).distinct()

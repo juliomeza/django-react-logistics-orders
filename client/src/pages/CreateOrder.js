@@ -15,6 +15,7 @@ const CreateOrder = () => {
   const [orderTypes, setOrderTypes] = useState([]);
   const [orderClasses, setOrderClasses] = useState([]);
   const [carriers, setCarriers] = useState([]);
+  const [carrierServices, setCarrierServices] = useState([]);
   const [contacts, setContacts] = useState([]);
   const [addresses, setAddresses] = useState([]);
   
@@ -48,6 +49,7 @@ const CreateOrder = () => {
           contactsRes,
           addressesRes,
           carriersRes,
+          carrierServicesRes, // agregado
         ] = await Promise.all([
           axios.get('http://localhost:8000/api/order-types/', { withCredentials: true }),
           axios.get('http://localhost:8000/api/order-classes/', { withCredentials: true }),
@@ -56,6 +58,7 @@ const CreateOrder = () => {
           axios.get('http://localhost:8000/api/contacts/', { withCredentials: true }),
           axios.get('http://localhost:8000/api/addresses/', { withCredentials: true }),
           axios.get('http://localhost:8000/api/carriers/', { withCredentials: true }),
+          axios.get('http://localhost:8000/api/carrier-services/', { withCredentials: true }),
         ]);
 
         setOrderTypes(orderTypesRes.data);
@@ -75,6 +78,7 @@ const CreateOrder = () => {
         setContacts(contactsRes.data);
         setAddresses(addressesRes.data);
         setCarriers(carriersRes.data);
+        setCarrierServices(carrierServicesRes.data);
       } catch (err) {
         setError('Error al cargar los datos de selección.');
       }
@@ -226,13 +230,19 @@ const CreateOrder = () => {
         </TextField>
         {/* Service Type (opcional) */}
         <TextField
+          select
           label="Service Type"
           name="service_type"
-          type="number"
           value={formData.service_type}
           onChange={handleChange}
           fullWidth
-        />
+        >
+          {carrierServices.map((service) => (
+            <MenuItem key={service.id} value={service.id}>
+              {service.name}
+            </MenuItem>
+        ))}
+        </TextField>
         {/* Expected Delivery Date */}
         <TextField
           label="Expected Delivery Date"
