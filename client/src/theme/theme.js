@@ -12,6 +12,7 @@ const theme = createTheme({
   typography: {
     fontFamily: 'Roboto, Arial, sans-serif',
   },
+  spacing: 10, // Aumenta el espaciado base para una apariencia más pulida
 });
 
 export default theme;
