@@ -87,6 +87,21 @@ const CreateOrder = () => {
     fetchData();
   }, [user]);
 
+  // Establecer el order_status internamente al estado "Created"
+  useEffect(() => {
+    if (orderStatuses.length > 0) {
+      const createdStatus = orderStatuses.find(
+        (status) => status.lookup_code === '01_created'
+      );
+      if (createdStatus) {
+        setFormData((prev) => ({
+          ...prev,
+          order_status: createdStatus.id,
+        }));
+      }
+    }
+  }, [orderStatuses]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -147,18 +162,6 @@ const CreateOrder = () => {
               required
               options={orderClasses}
               getOptionLabel={(option) => option.class_name}
-              getOptionValue={(option) => option.id}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <SelectField
-              label="Order Status"
-              name="order_status"
-              value={formData.order_status}
-              onChange={handleChange}
-              required
-              options={orderStatuses}
-              getOptionLabel={(option) => option.status_name}
               getOptionValue={(option) => option.id}
             />
           </Grid>
@@ -230,17 +233,7 @@ const CreateOrder = () => {
               getOptionValue={(option) => option.id}
             />
           </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField
-              label="Expected Delivery Date"
-              name="expected_delivery_date"
-              type="date"
-              value={formData.expected_delivery_date}
-              onChange={handleChange}
-              slotProps={{ inputLabel: { shrink: true } }}
-              fullWidth
-            />
-          </Grid>
+          
           <Grid size={{ xs: 12, sm: 6 }}>
             <SelectField
               label="Contact"
@@ -253,6 +246,17 @@ const CreateOrder = () => {
                 `${option.first_name} ${option.last_name}`
               }
               getOptionValue={(option) => option.id}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField
+              label="Expected Delivery Date"
+              name="expected_delivery_date"
+              type="date"
+              value={formData.expected_delivery_date}
+              onChange={handleChange}
+              slotProps={{ inputLabel: { shrink: true } }}
+              fullWidth
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
@@ -286,7 +290,7 @@ const CreateOrder = () => {
               value={formData.notes}
               onChange={handleChange}
               multiline
-              rows={3}
+              rows={2}
               fullWidth
             />
           </Grid>
