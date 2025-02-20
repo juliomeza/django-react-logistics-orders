@@ -1,19 +1,24 @@
 from rest_framework import viewsets
-from .models import OrderClass, OrderType, Order, OrderLine
+from .models import OrderStatus, OrderType, OrderClass, Order, OrderLine
 from .serializers import (
-    OrderClassSerializer,
+    OrderStatusSerializer,
     OrderTypeSerializer,
+    OrderClassSerializer,
     OrderSerializer,
     OrderLineSerializer
 )
 
-class OrderClassViewSet(viewsets.ModelViewSet):
-    queryset = OrderClass.objects.all()
-    serializer_class = OrderClassSerializer
+class OrderStatusViewSet(viewsets.ModelViewSet):
+    queryset = OrderStatus.objects.all()
+    serializer_class = OrderStatusSerializer
 
 class OrderTypeViewSet(viewsets.ModelViewSet):
     queryset = OrderType.objects.all()
     serializer_class = OrderTypeSerializer
+
+class OrderClassViewSet(viewsets.ModelViewSet):
+    queryset = OrderClass.objects.all()
+    serializer_class = OrderClassSerializer
 
 class OrderViewSet(viewsets.ModelViewSet):
     # Agregamos un queryset por defecto para que el router pueda determinar el basename

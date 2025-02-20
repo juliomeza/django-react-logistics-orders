@@ -1,14 +1,19 @@
 from rest_framework import serializers
-from .models import OrderClass, OrderType, Order, OrderLine
+from .models import OrderStatus, OrderClass, OrderType, Order, OrderLine
 
-class OrderClassSerializer(serializers.ModelSerializer):
+class OrderStatusSerializer(serializers.ModelSerializer):
     class Meta:
-        model = OrderClass
+        model = OrderStatus
         fields = '__all__'
 
 class OrderTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderType
+        fields = '__all__'
+
+class OrderClassSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderClass
         fields = '__all__'
 
 class OrderSerializer(serializers.ModelSerializer):
