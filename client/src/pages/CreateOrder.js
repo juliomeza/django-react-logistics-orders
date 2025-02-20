@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Container, Typography, TextField, Button, MenuItem, Box } from '@mui/material';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
+import apiProtected from '../services/apiProtected';
 
 const CreateOrder = () => {
   const { user } = useContext(AuthContext);
@@ -18,7 +18,6 @@ const CreateOrder = () => {
   const [carrierServices, setCarrierServices] = useState([]);
   const [contacts, setContacts] = useState([]);
   const [addresses, setAddresses] = useState([]);
-  
 
   // Estado del formulario
   const [formData, setFormData] = useState({
@@ -49,21 +48,21 @@ const CreateOrder = () => {
           contactsRes,
           addressesRes,
           carriersRes,
-          carrierServicesRes, // agregado
+          carrierServicesRes,
         ] = await Promise.all([
-          axios.get('http://localhost:8000/api/order-types/', { withCredentials: true }),
-          axios.get('http://localhost:8000/api/order-classes/', { withCredentials: true }),
-          axios.get('http://localhost:8000/api/projects/', { withCredentials: true }),
-          axios.get('http://localhost:8000/api/warehouses/', { withCredentials: true }),
-          axios.get('http://localhost:8000/api/contacts/', { withCredentials: true }),
-          axios.get('http://localhost:8000/api/addresses/', { withCredentials: true }),
-          axios.get('http://localhost:8000/api/carriers/', { withCredentials: true }),
-          axios.get('http://localhost:8000/api/carrier-services/', { withCredentials: true }),
+          apiProtected.get('order-types/'),
+          apiProtected.get('order-classes/'),
+          apiProtected.get('projects/'),
+          apiProtected.get('warehouses/'),
+          apiProtected.get('contacts/'),
+          apiProtected.get('addresses/'),
+          apiProtected.get('carriers/'),
+          apiProtected.get('carrier-services/'),
         ]);
 
         setOrderTypes(orderTypesRes.data);
         setOrderClasses(orderClassesRes.data);
-        // Filtramos los proyectos para mostrar solo los que tengan al usuario en su propiedad "users"
+        // Filtramos los proyectos para mostrar solo los que tienen al usuario en su propiedad "users"
         if (user && user.id) {
           const userId = parseInt(user.id, 10);
           setProjects(
@@ -97,7 +96,7 @@ const CreateOrder = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8000/api/orders/', formData, { withCredentials: true });
+      await apiProtected.post('orders/', formData);
       navigate('/secure');
     } catch (err) {
       setError('Error al crear la orden.');
@@ -241,7 +240,7 @@ const CreateOrder = () => {
             <MenuItem key={service.id} value={service.id}>
               {service.name}
             </MenuItem>
-        ))}
+          ))}
         </TextField>
         {/* Expected Delivery Date */}
         <TextField
@@ -311,11 +310,9 @@ const CreateOrder = () => {
           rows={3}
           fullWidth
         />
-        
         <Button type="submit" variant="contained" color="primary">
           Enviar Orden
         </Button>
-      
       </Box>
     </Container>
   );
