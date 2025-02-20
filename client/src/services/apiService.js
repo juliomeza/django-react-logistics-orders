@@ -5,22 +5,24 @@ const api = axios.create({
   withCredentials: true,
 });
 
-export const setupInterceptors = (navigate) => {
-  api.interceptors.response.use(
+export const setupInterceptors = (axiosInstance, navigate) => {
+  axiosInstance.interceptors.response.use(
     (response) => response,
     async (error) => {
       const originalRequest = error.config;
-      // Si la petición ya es para refresh, no reintentar para evitar bucles
+      // Evitamos reintentos en llamadas al endpoint refresh
       if (originalRequest.url.includes('refresh/')) {
         return Promise.reject(error);
       }
       if (error.response && error.response.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true;
         try {
-          await api.post('refresh/');
-          return api(originalRequest);
+          await axiosInstance.post('refresh/');
+          return axiosInstance(originalRequest);
         } catch (err) {
-          navigate('/login');
+          if (navigate) {
+            navigate('/login');
+          }
           return Promise.reject(err);
         }
       }

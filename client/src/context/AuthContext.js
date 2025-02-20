@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api, { setupInterceptors } from '../services/apiService';
+import apiProtected from '../services/apiProtected';
 
 const AuthContext = createContext();
 
@@ -24,9 +25,10 @@ export const AuthProvider = ({ children }) => {
     checkAuthStatus();
   }, []);
 
-  // Configuramos el interceptor de api con el navigate
+  // Configuramos los interceptors para ambas instancias usando el navigate
   useEffect(() => {
-    setupInterceptors(navigate);
+    setupInterceptors(api, navigate);
+    setupInterceptors(apiProtected, navigate);
   }, [navigate]);
 
   const login = async (credentials) => {

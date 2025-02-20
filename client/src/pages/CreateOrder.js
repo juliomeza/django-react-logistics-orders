@@ -1,15 +1,16 @@
+// CreateOrder.js
 import React, { useState, useEffect, useContext } from 'react';
 import { Container, Typography, TextField, Button, MenuItem, Box } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import apiProtected from '../services/apiProtected';
 
 const CreateOrder = () => {
-  const { user } = useContext(AuthContext);
+  // Llamamos a todos los hooks incondicionalmente
+  const { user, loading } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [error, setError] = useState('');
 
-  // Opciones para los dropdowns
+  const [error, setError] = useState('');
   const [warehouses, setWarehouses] = useState([]);
   const [projects, setProjects] = useState([]);
   const [orderTypes, setOrderTypes] = useState([]);
@@ -18,8 +19,6 @@ const CreateOrder = () => {
   const [carrierServices, setCarrierServices] = useState([]);
   const [contacts, setContacts] = useState([]);
   const [addresses, setAddresses] = useState([]);
-
-  // Estado del formulario
   const [formData, setFormData] = useState({
     lookup_code_order: '',
     lookup_code_shipment: '',
@@ -37,7 +36,9 @@ const CreateOrder = () => {
     service_type: '',
   });
 
+  // Siempre se llama a useEffect; dentro verificamos si hay usuario
   useEffect(() => {
+    if (!user) return; // Si no hay usuario, no hacemos la petición
     const fetchData = async () => {
       try {
         const [
@@ -62,17 +63,15 @@ const CreateOrder = () => {
 
         setOrderTypes(orderTypesRes.data);
         setOrderClasses(orderClassesRes.data);
-        // Filtramos los proyectos para mostrar solo los que tienen al usuario en su propiedad "users"
-        if (user && user.id) {
-          const userId = parseInt(user.id, 10);
-          setProjects(
-            projectsRes.data.filter((proj) =>
-              Array.isArray(proj.users) && proj.users.includes(userId)
-            )
-          );
-        } else {
-          setProjects(projectsRes.data);
-        }
+
+        // Filtramos solo los proyectos del usuario
+        const userId = parseInt(user.id, 10);
+        setProjects(
+          projectsRes.data.filter((proj) =>
+            Array.isArray(proj.users) && proj.users.includes(userId)
+          )
+        );
+
         setWarehouses(warehousesRes.data);
         setContacts(contactsRes.data);
         setAddresses(addressesRes.data);
@@ -82,6 +81,7 @@ const CreateOrder = () => {
         setError('Error al cargar los datos de selección.');
       }
     };
+
     fetchData();
   }, [user]);
 
@@ -102,6 +102,20 @@ const CreateOrder = () => {
       setError('Error al crear la orden.');
     }
   };
+
+  // En el render: si está cargando, mostramos loading.
+  // Si ya terminó de cargar y no hay usuario, redirigimos a login.
+  if (loading) {
+    return (
+      <Container sx={{ mt: 4 }}>
+        <Typography>Loading...</Typography>
+      </Container>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
 
   return (
     <Container sx={{ mt: 4 }}>
@@ -134,6 +148,7 @@ const CreateOrder = () => {
             </MenuItem>
           ))}
         </TextField>
+
         {/* Order Class */}
         <TextField
           select
@@ -150,6 +165,7 @@ const CreateOrder = () => {
             </MenuItem>
           ))}
         </TextField>
+
         {/* Order Status */}
         <TextField
           label="Order Status"
@@ -160,6 +176,7 @@ const CreateOrder = () => {
           fullWidth
           required
         />
+
         {/* Lookup Code Order */}
         <TextField
           label="Lookup Code Order"
@@ -170,6 +187,7 @@ const CreateOrder = () => {
           fullWidth
           required
         />
+
         {/* Lookup Code Shipment */}
         <TextField
           label="Lookup Code Shipment"
@@ -180,6 +198,7 @@ const CreateOrder = () => {
           fullWidth
           required
         />
+
         {/* Warehouse */}
         <TextField
           select
@@ -196,6 +215,7 @@ const CreateOrder = () => {
             </MenuItem>
           ))}
         </TextField>
+
         {/* Project */}
         <TextField
           select
@@ -212,6 +232,7 @@ const CreateOrder = () => {
             </MenuItem>
           ))}
         </TextField>
+
         {/* Carrier (opcional) */}
         <TextField
           select
@@ -227,6 +248,7 @@ const CreateOrder = () => {
             </MenuItem>
           ))}
         </TextField>
+
         {/* Service Type (opcional) */}
         <TextField
           select
@@ -242,6 +264,7 @@ const CreateOrder = () => {
             </MenuItem>
           ))}
         </TextField>
+
         {/* Expected Delivery Date */}
         <TextField
           label="Expected Delivery Date"
@@ -252,6 +275,7 @@ const CreateOrder = () => {
           InputLabelProps={{ shrink: true }}
           fullWidth
         />
+
         {/* Contact */}
         <TextField
           select
@@ -268,6 +292,7 @@ const CreateOrder = () => {
             </MenuItem>
           ))}
         </TextField>
+
         {/* Shipping Address */}
         <TextField
           select
@@ -284,6 +309,7 @@ const CreateOrder = () => {
             </MenuItem>
           ))}
         </TextField>
+
         {/* Billing Address */}
         <TextField
           select
@@ -300,6 +326,7 @@ const CreateOrder = () => {
             </MenuItem>
           ))}
         </TextField>
+
         {/* Notes */}
         <TextField
           label="Notes"
@@ -310,6 +337,7 @@ const CreateOrder = () => {
           rows={3}
           fullWidth
         />
+
         <Button type="submit" variant="contained" color="primary">
           Enviar Orden
         </Button>
