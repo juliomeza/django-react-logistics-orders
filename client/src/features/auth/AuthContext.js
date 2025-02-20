@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
       const response = await api.post('login/', credentials);
       if (response.status === 200) {
         await checkAuthStatus();
-        navigate('/secure');
+        navigate('/dashboard');
       }
     } catch (error) {
       console.error('Error de login', error);
