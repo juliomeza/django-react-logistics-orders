@@ -4,7 +4,7 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import AuthContext from '../../auth/AuthContext';
 import OrderDetailsStep from '../components/orderDetails/OrderDetailsStep';
 import apiProtected from '../../../services/api/secureApi';
-import StepperHeader from './StepperHeader';
+import StepperHeader from '../components/StepperHeader';
 
 const MultiStepCreateOrder = () => {
   const { user, loading } = useContext(AuthContext);
