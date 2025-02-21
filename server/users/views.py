@@ -69,14 +69,6 @@ class LogoutView(APIView):
         response.delete_cookie('refresh_token')
         return response
 
-# class AuthStatusView(APIView):
-#     # No forzamos permisos aquí para que, en caso de token inválido, request.user sea Anonymous
-#     def get(self, request):
-#         user = request.user
-#         if user and user.is_authenticated:
-#             return Response({'user': {'first_name': user.first_name, 'last_name': user.last_name}}, status=status.HTTP_200_OK)
-#         return Response({'user': None}, status=status.HTTP_200_OK)
-
 class AuthStatusView(APIView):
     # No forzamos permisos para que, en caso de token inválido, request.user sea Anonymous
     def get(self, request):

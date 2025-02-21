@@ -20,18 +20,16 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import AuthContext from '../../features/auth/AuthContext';
 
 const Header = () => {
-  const { user, logout } = useContext(AuthContext);
+  // Incluimos loading para controlar el renderizado
+  const { user, logout, loading } = useContext(AuthContext);
   const location = useLocation();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
 
-  // Datos del usuario (nombre y compañía, de ejemplo)
-  const fullName = user
-    ? `${user.first_name} ${user.last_name}`
-    : 'Usuario Invitado';
-  const companyName = 'ABC Logistics';
+  const fullName = user ? `${user.first_name} ${user.last_name}` : 'Usuario Invitado';
+  // Mientras loading sea true, mostramos cadena vacía
+  const clientName = !loading && user ? (user.client_name ? user.client_name : 'Empresa no definida') : '';
 
-  // Determinar la pestaña activa según la ruta
   const currentTab =
     location.pathname === '/dashboard'
       ? 0
@@ -39,45 +37,34 @@ const Header = () => {
       ? 1
       : 0;
 
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
+  const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
+  const handleMenuClose = () => setAnchorEl(null);
   const handleLogout = () => {
     handleMenuClose();
     logout();
   };
-
   const handleProfile = () => {
     handleMenuClose();
     // Lógica para ir a "Mi Perfil"
   };
-
   const handleSettings = () => {
     handleMenuClose();
     // Lógica para ir a "Configuración"
   };
-
   const handleTabChange = (event, newValue) => {
-    if (newValue === 0) {
-      navigate('/dashboard');
-    } else if (newValue === 1) {
-      navigate('/create-order');
-    }
+    if (newValue === 0) navigate('/dashboard');
+    else if (newValue === 1) navigate('/create-order');
   };
 
   return (
     <AppBar position="fixed" color="default" elevation={1}>
       <Container maxWidth="lg">
         <Toolbar>
-          {/* Puedes mantener el título o logo aquí */}
+          {/* Muestra el nombre del cliente solo cuando ya se cargó */}
           <Typography variant="h6" sx={{ mr: 4 }}>
-            Granules Pharma
+            {clientName}
           </Typography>
 
-          {/* Menú de navegación con Tabs */}
           <Tabs
             value={currentTab}
             onChange={handleTabChange}
@@ -89,7 +76,6 @@ const Header = () => {
             <Tab label="Create Order" />
           </Tabs>
 
-          {/* Avatar y menú de usuario */}
           <IconButton color="inherit" onClick={handleMenuOpen}>
             <Avatar>
               {user && user.first_name
@@ -107,7 +93,7 @@ const Header = () => {
             <Box sx={{ px: 2, py: 1 }}>
               <Typography variant="subtitle1">{fullName}</Typography>
               <Typography variant="body2" color="text.secondary">
-                {companyName}
+                {clientName}
               </Typography>
             </Box>
             <Divider sx={{ my: 1 }} />
