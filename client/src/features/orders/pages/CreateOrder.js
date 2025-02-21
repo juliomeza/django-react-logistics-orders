@@ -140,7 +140,7 @@ const CreateOrder = () => {
   }
 
   // Barra de pasos (simulada)
-  const steps = ['1', '2', '3'];
+  const steps = ['Order Details', 'Materials', 'Review'];
 
   return (
     <Container sx={{ mt: 4, mb: 4 }}>
@@ -148,7 +148,7 @@ const CreateOrder = () => {
         Create New Order
       </Typography>
 
-      {/* Stepper con 3 pasos (ficticios) */}
+      {/* Stepper con 3 pasos */}
       <Stepper activeStep={0} alternativeLabel sx={{ mb: 4 }}>
         {steps.map((label) => (
           <Step key={label}>
@@ -167,7 +167,7 @@ const CreateOrder = () => {
         {/* Sección 1: Basic Order Information */}
         <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
           <Typography variant="subtitle1" sx={{ mb: 2 }}>
-            1. Basic Order Information
+            Basic Order Information
           </Typography>
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6 }}>
@@ -222,7 +222,7 @@ const CreateOrder = () => {
         {/* Sección 2: Logistics Information */}
         <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
           <Typography variant="subtitle1" sx={{ mb: 2 }}>
-            2. Logistics Information
+            Logistics Information
           </Typography>
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6 }}>
@@ -277,7 +277,7 @@ const CreateOrder = () => {
         {/* Sección 3: Delivery Information */}
         <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
           <Typography variant="subtitle1" sx={{ mb: 2 }}>
-            3. Delivery Information
+            Delivery Information
           </Typography>
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6 }}>
@@ -329,6 +329,15 @@ const CreateOrder = () => {
                 getOptionValue={(option) => option.id}
               />
             </Grid>
+          </Grid>
+        </Paper>
+
+        {/* Sección 4: Additional Information */}
+        <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
+          <Typography variant="subtitle1" sx={{ mb: 2 }}>
+            Additional Information
+          </Typography>
+          <Grid container spacing={2}>
             <Grid size={12}>
               <TextField
                 label="Notes"

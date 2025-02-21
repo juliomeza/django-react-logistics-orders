@@ -12,7 +12,34 @@ const theme = createTheme({
   typography: {
     fontFamily: 'Roboto, Arial, sans-serif',
   },
-  spacing: 10, // Aumenta el espaciado base para una apariencia más pulida
+  spacing: 10, // Espaciado base
+  components: {
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          // Sombra sutil
+          boxShadow: '0 2px 4px rgba(0,0,0,0.08)',
+        },
+      },
+    },
+    // Personalización de la barra de progreso del Stepper
+    MuiStepConnector: {
+      styleOverrides: {
+        line: {
+          borderTopWidth: '3px', // Barra de progreso más gruesa
+        },
+      },
+    },
+    MuiStepIcon: {
+      styleOverrides: {
+        root: {
+          width: 36,
+          height: 36,
+          fontSize: '16px',
+        },
+      },
+    },
+  },
 });
 
 export default theme;
