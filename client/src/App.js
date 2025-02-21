@@ -3,6 +3,7 @@ import { AuthProvider } from './features/auth/AuthContext';
 import Login from './features/auth/Login';
 import Dashboard from './features/orders/pages/Dashboard';
 import CreateOrder from './features/orders/pages/CreateOrder';
+import MainLayout from './features/layout/MainLayout';
 
 const App = () => {
   return (
@@ -11,8 +12,22 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/create-order" element={<CreateOrder />} />
+          <Route
+            path="/dashboard"
+            element={
+              <MainLayout>
+                <Dashboard />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/create-order"
+            element={
+              <MainLayout>
+                <CreateOrder />
+              </MainLayout>
+            }
+          />
         </Routes>
       </AuthProvider>
     </Router>

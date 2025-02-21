@@ -14,6 +14,23 @@ const theme = createTheme({
   },
   spacing: 10, // Espaciado base
   components: {
+    MuiAppBar: {
+      defaultProps: {
+        // Esto hace que el AppBar use la paleta "default" (no la primary)
+        color: 'default',
+        elevation: 0, // Sin sombra
+      },
+      styleOverrides: {
+        root: {
+          // Fondo blanco
+          backgroundColor: '#fff',
+          // Texto oscuro
+          color: '#000',
+          // Si quieres una línea sutil de separación en la parte inferior
+          borderBottom: '1px solid #ddd',
+        },
+      },
+    },
     MuiPaper: {
       styleOverrides: {
         root: {
