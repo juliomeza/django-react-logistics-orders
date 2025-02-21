@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Container, Typography, Button, CircularProgress, List, ListItem, ListItemText } from '@mui/material';
-import { useNavigate, Navigate } from 'react-router-dom';
+import { Container, Typography, CircularProgress, List, ListItem, ListItemText } from '@mui/material';
+import { Navigate } from 'react-router-dom';
 import AuthContext from '../../auth/AuthContext';
 import axios from 'axios';
 
 const Dashboard = () => {
   const { user, loading } = useContext(AuthContext);
-  const navigate = useNavigate();
 
   // Estado para las órdenes
   const [orders, setOrders] = useState([]);
@@ -46,21 +45,8 @@ const Dashboard = () => {
     return <Navigate to="/login" />;
   }
 
-  const handleCreateOrder = () => {
-    navigate('/create-order');
-  };
-
   return (
     <Container maxWidth="sm" sx={{ textAlign: 'center', mt: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Dashboard
-      </Typography>
-      <Typography variant="h6" gutterBottom>
-        Bienvenido, {user.first_name}!
-      </Typography>
-      <Button variant="contained" color="primary" onClick={handleCreateOrder} sx={{ mb: 2 }}>
-        Crear Orden
-      </Button>
       {ordersLoading ? (
         <div>
           <CircularProgress />
@@ -71,14 +57,14 @@ const Dashboard = () => {
       ) : (
         <>
           <Typography variant="h5" gutterBottom>
-            Órdenes Abiertas
+            Open Orders
           </Typography>
           <List>
             {orders.map((order) => (
               <ListItem key={order.id}>
                 <ListItemText
-                  primary={`Orden: ${order.lookup_code_order}`}
-                  secondary={`Estado: ${order.order_status_name}`}
+                  primary={`Order: ${order.lookup_code_order}`}
+                  secondary={`Status: ${order.order_status_name}`}
                 />
               </ListItem>
             ))}

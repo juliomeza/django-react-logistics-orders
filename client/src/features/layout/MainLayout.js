@@ -6,7 +6,8 @@ const MainLayout = ({ children }) => {
   return (
     <>
       <Header />
-      <Box sx={{ mt: 2, p: 2 }}>
+      <Box sx={{ height: '32px' }} />
+      <Box sx={{ p: 2 }}>
         {children}
       </Box>
     </>

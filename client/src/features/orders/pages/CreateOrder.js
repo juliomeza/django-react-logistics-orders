@@ -144,10 +144,6 @@ const CreateOrder = () => {
 
   return (
     <Container sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h5" gutterBottom>
-        Create New Order
-      </Typography>
-
       {/* Stepper con 3 pasos */}
       <Stepper activeStep={0} alternativeLabel sx={{ mb: 4 }}>
         {steps.map((label) => (
