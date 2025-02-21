@@ -6,44 +6,39 @@ const theme = createTheme({
       main: '#1976d2', // Azul de MUI
     },
     secondary: {
-      main: '#dc004e', // Rojo oscuro
+      main: '#dc004e',
     },
   },
   typography: {
     fontFamily: 'Roboto, Arial, sans-serif',
   },
-  spacing: 10, // Espaciado base
+  spacing: 10,
   components: {
     MuiAppBar: {
       defaultProps: {
-        // Esto hace que el AppBar use la paleta "default" (no la primary)
         color: 'default',
-        elevation: 0, // Sin sombra
+        elevation: 1,
       },
       styleOverrides: {
         root: {
-          // Fondo blanco
           backgroundColor: '#fff',
-          // Texto oscuro
           color: '#000',
-          // Si quieres una línea sutil de separación en la parte inferior
-          borderBottom: '1px solid #ddd',
+          // Sin redondeo, y una sombra sutil en la parte inferior
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
         },
       },
     },
     MuiPaper: {
       styleOverrides: {
         root: {
-          // Sombra sutil
-          boxShadow: '0 2px 4px rgba(0,0,0,0.08)',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
         },
       },
     },
-    // Personalización de la barra de progreso del Stepper
     MuiStepConnector: {
       styleOverrides: {
         line: {
-          borderTopWidth: '3px', // Barra de progreso más gruesa
+          borderTopWidth: '3px',
         },
       },
     },

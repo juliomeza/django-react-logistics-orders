@@ -5,7 +5,7 @@ import AuthContext from '../../auth/AuthContext';
 import axios from 'axios';
 
 const Dashboard = () => {
-  const { user, logout, loading } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
   const navigate = useNavigate();
 
   // Estado para las órdenes
@@ -85,9 +85,6 @@ const Dashboard = () => {
           </List>
         </>
       )}
-      <Button variant="contained" color="secondary" onClick={logout} sx={{ mt: 4 }}>
-        Cerrar Sesión
-      </Button>
     </Container>
   );
 };
