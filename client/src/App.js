@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import { AuthProvider } from './features/auth/AuthContext';
 import Login from './features/auth/Login';
 import Dashboard from './features/orders/pages/Dashboard';
-import CreateOrder from './features/orders/pages/CreateOrder';
+import MultiStepCreateOrder from './features/orders/pages/MultiStepCreateOrder';
 import MainLayout from './features/layout/MainLayout';
 
 const App = () => {
@@ -24,7 +24,7 @@ const App = () => {
             path="/create-order"
             element={
               <MainLayout>
-                <CreateOrder />
+                <MultiStepCreateOrder />
               </MainLayout>
             }
           />
