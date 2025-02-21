@@ -1,9 +1,9 @@
 import React from 'react';
 import { Paper, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import SelectField from '../components/SelectField';
+import SelectField from '../SelectField';
 
-const OrderDetails_LogisticsInformation = ({
+const OrderDetailsLogisticsInformation = ({
   formData,
   handleChange,
   warehouses = [],
@@ -68,4 +68,4 @@ const OrderDetails_LogisticsInformation = ({
   );
 };
 
-export default OrderDetails_LogisticsInformation;
+export default OrderDetailsLogisticsInformation;

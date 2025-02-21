@@ -1,9 +1,9 @@
 import React from 'react';
 import { Paper, Typography, TextField } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import SelectField from '../components/SelectField';
+import SelectField from '../SelectField';
 
-const OrderDetails_DeliveryInformation = ({ formData, handleChange, contacts = [], addresses = [] }) => {
+const OrderDetailsDeliveryInformation = ({ formData, handleChange, contacts = [], addresses = [] }) => {
   return (
     <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
       <Typography variant="subtitle1" sx={{ mb: 2 }}>
@@ -62,4 +62,4 @@ const OrderDetails_DeliveryInformation = ({ formData, handleChange, contacts = [
   );
 };
 
-export default OrderDetails_DeliveryInformation;
+export default OrderDetailsDeliveryInformation;

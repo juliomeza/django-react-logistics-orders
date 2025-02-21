@@ -1,9 +1,9 @@
 import React from 'react';
 import { Paper, Typography, TextField } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import SelectField from '../components/SelectField';
+import SelectField from '../SelectField';
 
-const OrderDetails_BasicOrderInformation = ({
+const OrderDetailsBasicOrderInformation = ({
   formData,
   handleChange,
   orderTypes = [],
@@ -64,4 +64,4 @@ const OrderDetails_BasicOrderInformation = ({
   );
 };
 
-export default OrderDetails_BasicOrderInformation;
+export default OrderDetailsBasicOrderInformation;

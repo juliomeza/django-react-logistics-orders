@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { Container, Typography, Button, Box, Stepper, Step, StepLabel } from '@mui/material';
 import { useNavigate, Navigate } from 'react-router-dom';
 import AuthContext from '../../auth/AuthContext';
-import OrderDetailsStep from './OrderDetailsStep';
+import OrderDetailsStep from '../components/orderDetails/OrderDetailsStep';
 import apiProtected from '../../../services/api/secureApi';
 
 const MultiStepCreateOrder = () => {

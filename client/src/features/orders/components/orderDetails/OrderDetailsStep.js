@@ -1,8 +1,8 @@
 import React from 'react';
-import OrderDetails_BasicOrderInformation from './OrderDetails_BasicOrderInformation';
-import OrderDetails_LogisticsInformation from './OrderDetails_LogisticsInformation';
-import OrderDetails_DeliveryInformation from './OrderDetails_DeliveryInformation';
-import OrderDetails_AdditionalInformation from './OrderDetails_AdditionalInformation';
+import OrderDetailsBasicOrderInformation from './OrderDetailsBasicOrderInformation';
+import OrderDetailsLogisticsInformation from './OrderDetailsLogisticsInformation';
+import OrderDetailsDeliveryInformation from './OrderDetailsDeliveryInformation';
+import OrderDetailsAdditionalInformation from './OrderDetailsAdditionalInformation';
 
 const OrderDetailsStep = ({
   formData,
@@ -18,13 +18,13 @@ const OrderDetailsStep = ({
 }) => {
   return (
     <>
-      <OrderDetails_BasicOrderInformation
+      <OrderDetailsBasicOrderInformation
         formData={formData}
         handleChange={handleChange}
         orderTypes={orderTypes}
         orderClasses={orderClasses}
       />
-      <OrderDetails_LogisticsInformation
+      <OrderDetailsLogisticsInformation
         formData={formData}
         handleChange={handleChange}
         warehouses={warehouses}
@@ -32,13 +32,13 @@ const OrderDetailsStep = ({
         carriers={carriers}
         carrierServices={carrierServices}
       />
-      <OrderDetails_DeliveryInformation
+      <OrderDetailsDeliveryInformation
         formData={formData}
         handleChange={handleChange}
         contacts={contacts}
         addresses={addresses}
       />
-      <OrderDetails_AdditionalInformation
+      <OrderDetailsAdditionalInformation
         formData={formData}
         handleChange={handleChange}
       />

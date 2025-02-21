@@ -2,7 +2,7 @@ import React from 'react';
 import { Paper, Typography, TextField } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
-const OrderDetails_AdditionalInformation = ({ formData, handleChange }) => {
+const OrderDetailsAdditionalInformation = ({ formData, handleChange }) => {
   return (
     <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
       <Typography variant="subtitle1" sx={{ mb: 2 }}>
@@ -25,4 +25,4 @@ const OrderDetails_AdditionalInformation = ({ formData, handleChange }) => {
   );
 };
 
-export default OrderDetails_AdditionalInformation;
+export default OrderDetailsAdditionalInformation;
