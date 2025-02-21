@@ -1,9 +1,10 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Container, Typography, Button, Box, Stepper, Step, StepLabel } from '@mui/material';
+import { Container, Typography, Button, Box } from '@mui/material';
 import { useNavigate, Navigate } from 'react-router-dom';
 import AuthContext from '../../auth/AuthContext';
 import OrderDetailsStep from '../components/orderDetails/OrderDetailsStep';
 import apiProtected from '../../../services/api/secureApi';
+import StepperHeader from './StepperHeader';
 
 const MultiStepCreateOrder = () => {
   const { user, loading } = useContext(AuthContext);
@@ -26,7 +27,7 @@ const MultiStepCreateOrder = () => {
     billing_address: ''
   });
 
-  // Estados para opciones (inicialmente vacíos)
+  // Estados para opciones
   const [orderTypes, setOrderTypes] = useState([]);
   const [orderClasses, setOrderClasses] = useState([]);
   const [warehouses, setWarehouses] = useState([]);
@@ -36,7 +37,7 @@ const MultiStepCreateOrder = () => {
   const [contacts, setContacts] = useState([]);
   const [addresses, setAddresses] = useState([]);
 
-  // Cargar opciones (similiar a CreateOrder)
+  // Cargar opciones
   useEffect(() => {
     if (!user) return;
     const fetchData = async () => {
@@ -98,7 +99,6 @@ const MultiStepCreateOrder = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Aquí enviarías el formulario, por ejemplo:
     console.log('Form submitted:', formData);
     navigate('/dashboard');
   };
@@ -141,32 +141,30 @@ const MultiStepCreateOrder = () => {
   };
 
   return (
-    <Container sx={{ mt: 4, mb: 4 }}>
-      <Stepper activeStep={currentStep} alternativeLabel sx={{ mb: 4 }}>
-        {steps.map((label, index) => (
-          <Step key={label} completed={currentStep > index}>
-            <StepLabel>{label}</StepLabel>
-          </Step>
-        ))}
-      </Stepper>
-      <form onSubmit={handleSubmit}>
-        {renderStepContent(currentStep)}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-          <Button variant="outlined" onClick={handleBack} disabled={currentStep === 0}>
-            Back
-          </Button>
-          {currentStep < steps.length - 1 ? (
-            <Button variant="contained" onClick={handleNext}>
-              Next
+    <>
+      {/* Componente fijo para el Stepper */}
+      <StepperHeader activeStep={currentStep} steps={steps} />
+      {/* Agregamos margen superior para que el contenido no quede oculto detrás del Stepper */}
+      <Container sx={{ mt: 12, mb: 4 }}>
+        <form onSubmit={handleSubmit}>
+          {renderStepContent(currentStep)}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+            <Button variant="outlined" onClick={handleBack} disabled={currentStep === 0}>
+              Back
             </Button>
-          ) : (
-            <Button type="submit" variant="contained" color="primary">
-              Submit
-            </Button>
-          )}
-        </Box>
-      </form>
-    </Container>
+            {currentStep < steps.length - 1 ? (
+              <Button variant="contained" onClick={handleNext}>
+                Next
+              </Button>
+            ) : (
+              <Button type="submit" variant="contained" color="primary">
+                Submit
+              </Button>
+            )}
+          </Box>
+        </form>
+      </Container>
+    </>
   );
 };
 
