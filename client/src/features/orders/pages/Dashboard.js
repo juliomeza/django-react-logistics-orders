@@ -82,7 +82,7 @@ const Dashboard = () => {
       {/* Filtro por estado */}
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
         <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel id="status-filter-label">Filtrar por estado</InputLabel>
+          <InputLabel id="status-filter-label">Status</InputLabel>
           <Select
             labelId="status-filter-label"
             value={selectedStatus}
