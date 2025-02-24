@@ -21,6 +21,13 @@ const SelectField = ({
       onChange={onChange}
       fullWidth
       required={required}
+      slotProps={{
+        select: {
+          MenuProps: {
+            disableScrollLock: true,
+          },
+        },
+      }}
       {...props}
     >
       {options.map((option) => (
