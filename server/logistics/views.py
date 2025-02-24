@@ -21,7 +21,7 @@ class ContactViewSet(viewsets.ModelViewSet):
             return Contact.objects.none()
         
         user_projects = self.request.user.projects.all()
-        # Se filtran los contacts que están asociados a los proyectos del usuario
+        # Filter contacts associated with the user's projects
         return Contact.objects.filter(projects__in=user_projects).distinct()
 
 class WarehouseViewSet(viewsets.ModelViewSet):
@@ -33,7 +33,7 @@ class WarehouseViewSet(viewsets.ModelViewSet):
             return Warehouse.objects.none()
         
         user_projects = self.request.user.projects.all()
-        # Se filtran los warehouses que están asociados a los proyectos del usuario
+        # Filter warehouses associated with the user's projects
         return Warehouse.objects.filter(projects__in=user_projects).distinct()
 
 class CarrierViewSet(viewsets.ModelViewSet):
@@ -45,7 +45,7 @@ class CarrierViewSet(viewsets.ModelViewSet):
             return Carrier.objects.none()
         
         user_projects = self.request.user.projects.all()
-        # Se filtran los carriers que están asociados a los proyectos del usuario
+        # Filter carriers associated with the user's projects
         return Carrier.objects.filter(projects__in=user_projects).distinct()
 
 class CarrierServiceViewSet(viewsets.ModelViewSet):
@@ -57,5 +57,5 @@ class CarrierServiceViewSet(viewsets.ModelViewSet):
             return CarrierService.objects.none()
         
         user_projects = self.request.user.projects.all()
-        # Se filtran los carrier services que están asociados a los proyectos del usuario
+        # Filter carrier services associated with the user's projects
         return CarrierService.objects.filter(projects__in=user_projects).distinct()

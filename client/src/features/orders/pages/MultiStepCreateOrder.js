@@ -10,7 +10,7 @@ const MultiStepCreateOrder = () => {
   const { user, loading } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // Estado del formulario
+  // Form state
   const [formData, setFormData] = useState({
     lookup_code_order: '',
     lookup_code_shipment: '',
@@ -27,7 +27,7 @@ const MultiStepCreateOrder = () => {
     billing_address: ''
   });
 
-  // Estados para opciones
+  // States for options
   const [orderTypes, setOrderTypes] = useState([]);
   const [orderClasses, setOrderClasses] = useState([]);
   const [warehouses, setWarehouses] = useState([]);
@@ -37,7 +37,7 @@ const MultiStepCreateOrder = () => {
   const [contacts, setContacts] = useState([]);
   const [addresses, setAddresses] = useState([]);
 
-  // Cargar opciones
+  // Load options
   useEffect(() => {
     if (!user) return;
     const fetchData = async () => {
@@ -142,9 +142,9 @@ const MultiStepCreateOrder = () => {
 
   return (
     <>
-      {/* Componente fijo para el Stepper */}
+      {/* Fixed component for the Stepper */}
       <StepperHeader activeStep={currentStep} steps={steps} />
-      {/* Agregamos margen superior para que el contenido no quede oculto detrás del Stepper */}
+      {/* Add top margin so the content is not hidden behind the Stepper */}
       <Container sx={{ mt: 12, mb: 4 }}>
         <form onSubmit={handleSubmit}>
           {renderStepContent(currentStep)}

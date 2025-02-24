@@ -67,7 +67,7 @@ class LogoutView(APIView):
         return response
 
 class AuthStatusView(APIView):
-    # No forzamos permisos para que, en caso de token inválido, request.user sea Anonymous
+    # We do not enforce permissions so that, in case of an invalid token, request.user remains Anonymous
     def get(self, request):
         user = request.user
         if user and user.is_authenticated:
