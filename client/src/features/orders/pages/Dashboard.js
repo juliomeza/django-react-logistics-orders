@@ -43,7 +43,7 @@ const Dashboard = () => {
         setOrders(ordersRes.data);
         setOrderStatuses(statusesRes.data);
       } catch (err) {
-        setOrdersError('Error al cargar las órdenes o los estados.');
+        setOrdersError('Error loading orders or statuses.');
       } finally {
         setOrdersLoading(false);
       }
@@ -68,7 +68,7 @@ const Dashboard = () => {
     return (
       <Container maxWidth="md" sx={{ textAlign: 'center', mt: 4 }}>
         <CircularProgress />
-        <Typography variant="h6" mt={2}>Cargando...</Typography>
+        <Typography variant="h6" mt={2}>Loading...</Typography>
       </Container>
     );
   }
@@ -123,7 +123,7 @@ const Dashboard = () => {
             </TableHead>
             <TableBody>
               {filteredOrders.map((order) => {
-                const status = orderStatuses.find(s => s.id === order.order_status)?.name || 'Desconocido';
+                const status = orderStatuses.find(s => s.id === order.order_status)?.name || 'Unknown';
                 return (
                   <TableRow key={order.id} hover onClick={() => handleOrderClick(order.id)} sx={{ cursor: 'pointer' }}>
                     <TableCell>{order.lookup_code_order}</TableCell>
