@@ -11,16 +11,13 @@ class LoginView(APIView):
     permission_classes = [AllowAny]
     
     def post(self, request):
-        # username = request.data.get('username')
-        # password = request.data.get('password')
-        # user = authenticate(username=username, password=password)
         email = request.data.get('email')
         password = request.data.get('password')
         user = authenticate(email=email, password=password)
         if user is not None:
             refresh = RefreshToken.for_user(user)
             access = refresh.access_token
-            response = JsonResponse({'message': 'Login exitoso'})
+            response = JsonResponse({'message': 'Login successful'})
             response.set_cookie(
                 key='access_token',
                 value=str(access),
@@ -36,7 +33,7 @@ class LoginView(APIView):
                 samesite='Lax'
             )
             return response
-        return Response({'error': 'Credenciales inválidas'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class TokenRefreshView(APIView):
     permission_classes = [AllowAny]
@@ -44,11 +41,11 @@ class TokenRefreshView(APIView):
     def post(self, request):
         refresh_token = request.COOKIES.get('refresh_token')
         if not refresh_token:
-            return Response({'error': 'No se proporcionó refresh token'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'No refresh token provided'}, status=status.HTTP_400_BAD_REQUEST)
         try:
             refresh = RefreshToken(refresh_token)
             new_access = refresh.access_token
-            response = JsonResponse({'message': 'Token refrescado'})
+            response = JsonResponse({'message': 'Token refreshed'})
             response.set_cookie(
                 key='access_token',
                 value=str(new_access),
@@ -58,13 +55,13 @@ class TokenRefreshView(APIView):
             )
             return response
         except Exception:
-            return Response({'error': 'Refresh token inválido o expirado'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'error': 'Invalid or expired refresh token'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class LogoutView(APIView):
     permission_classes = [AllowAny]
     
     def post(self, request):
-        response = JsonResponse({'message': 'Logout exitoso'})
+        response = JsonResponse({'message': 'Logout successful'})
         response.delete_cookie('access_token')
         response.delete_cookie('refresh_token')
         return response
