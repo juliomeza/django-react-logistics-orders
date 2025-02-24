@@ -79,10 +79,6 @@ const Dashboard = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" gutterBottom align="center">
-        Dashboard - Ordenes Abiertas
-      </Typography>
-
       {/* Filtro por estado */}
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
         <FormControl sx={{ minWidth: 200 }}>
@@ -93,10 +89,10 @@ const Dashboard = () => {
             label="Filtrar por estado"
             onChange={(e) => setSelectedStatus(e.target.value)}
           >
-            <MenuItem value="all">Todos</MenuItem>
+            <MenuItem value="all">All</MenuItem>
             {orderStatuses.map((status) => (
               <MenuItem key={status.id} value={status.id}>
-                {status.name || status.lookup_code} {/* Ajusta según tu API */}
+                {status.name || status.status_name} {/* Ajusta según tu API */}
               </MenuItem>
             ))}
           </Select>
@@ -107,22 +103,22 @@ const Dashboard = () => {
       {ordersLoading ? (
         <Box sx={{ textAlign: 'center' }}>
           <CircularProgress />
-          <Typography mt={2}>Cargando órdenes...</Typography>
+          <Typography mt={2}>Loading orders...</Typography>
         </Box>
       ) : ordersError ? (
         <Typography color="error" align="center">{ordersError}</Typography>
       ) : filteredOrders.length === 0 ? (
-        <Typography align="center">No hay órdenes para mostrar.</Typography>
+        <Typography align="center">There are no orders to show.</Typography>
       ) : (
         <TableContainer component={Paper} sx={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell><Typography variant="subtitle2">Código de Orden</Typography></TableCell>
-                <TableCell><Typography variant="subtitle2">Estado</Typography></TableCell>
-                <TableCell><Typography variant="subtitle2">Tipo</Typography></TableCell>
-                <TableCell><Typography variant="subtitle2">Fecha Esperada</Typography></TableCell>
-                <TableCell><Typography variant="subtitle2">Acciones</Typography></TableCell>
+                <TableCell><Typography variant="subtitle2">Order</Typography></TableCell>
+                <TableCell><Typography variant="subtitle2">Status</Typography></TableCell>
+                <TableCell><Typography variant="subtitle2">Type</Typography></TableCell>
+                <TableCell><Typography variant="subtitle2">Expected Date</Typography></TableCell>
+                <TableCell><Typography variant="subtitle2"></Typography>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -136,7 +132,7 @@ const Dashboard = () => {
                     <TableCell>{order.expected_delivery_date || 'N/A'}</TableCell>
                     <TableCell>
                       <Button variant="outlined" size="small" onClick={(e) => { e.stopPropagation(); handleOrderClick(order.id); }}>
-                        Ver Detalles
+                        View Details
                       </Button>
                     </TableCell>
                   </TableRow>
