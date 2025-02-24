@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
     checkAuthStatus();
   }, []);
 
-  // Configuramos los interceptors para ambas instancias usando el navigate
+  // Configure interceptors for both instances using navigate
   useEffect(() => {
     setupInterceptors(api, navigate);
     setupInterceptors(apiProtected, navigate);
@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
         navigate('/dashboard');
       }
     } catch (error) {
-      console.error('Error de login', error);
+      console.error('Login error', error);
       throw error;
     }
   };
@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       navigate('/login');
     } catch (error) {
-      console.error('Error de logout', error);
+      console.error('Logout error', error);
     }
   };
 
