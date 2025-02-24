@@ -25,7 +25,7 @@ const Dashboard = () => {
   const { user, loading } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // Estado para las órdenes y filtros
+  // State for orders and filters
   const [orders, setOrders] = useState([]);
   const [orderStatuses, setOrderStatuses] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -54,14 +54,14 @@ const Dashboard = () => {
     }
   }, [user]);
 
-  // Filtrar órdenes según el estado seleccionado
+  // Filter orders based on the selected status
   const filteredOrders = selectedStatus === 'all'
     ? orders
     : orders.filter(order => order.order_status === parseInt(selectedStatus, 10));
 
-  // Manejar clic en una orden
+  // Handle click on an order
   const handleOrderClick = (orderId) => {
-    navigate(`/order/${orderId}`); // Esto asume que implementarás una ruta de detalles
+    navigate(`/order/${orderId}`); // This assumes you will implement a details route
   };
 
   if (loading) {
@@ -79,7 +79,7 @@ const Dashboard = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      {/* Filtro por estado */}
+      {/* Filter by status */}
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
         <FormControl sx={{ minWidth: 200 }}>
           <InputLabel id="status-filter-label">Status</InputLabel>
@@ -92,14 +92,14 @@ const Dashboard = () => {
             <MenuItem value="all">All</MenuItem>
             {orderStatuses.map((status) => (
               <MenuItem key={status.id} value={status.id}>
-                {status.name || status.status_name} {/* Ajusta según tu API */}
+                {status.name || status.status_name} {/* Adjust according to your API */}
               </MenuItem>
             ))}
           </Select>
         </FormControl>
       </Box>
 
-      {/* Tabla de órdenes */}
+      {/* Orders table */}
       {ordersLoading ? (
         <Box sx={{ textAlign: 'center' }}>
           <CircularProgress />
