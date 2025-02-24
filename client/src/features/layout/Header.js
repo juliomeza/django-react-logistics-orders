@@ -26,9 +26,9 @@ const Header = () => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
 
-  const fullName = user ? `${user.first_name} ${user.last_name}` : 'Usuario Invitado';
+  const fullName = user ? `${user.first_name} ${user.last_name}` : 'Guest User';
   // Mientras loading sea true, mostramos cadena vacía
-  const clientName = !loading && user ? (user.client_name ? user.client_name : 'Empresa no definida') : '';
+  const clientName = !loading && user ? (user.client_name ? user.client_name : 'Company not defined') : '';
 
   const currentTab =
     location.pathname === '/dashboard'
@@ -101,19 +101,19 @@ const Header = () => {
               <ListItemIcon>
                 <Person fontSize="small" />
               </ListItemIcon>
-              <ListItemText>Mi Perfil</ListItemText>
+              <ListItemText>Profile</ListItemText>
             </MenuItem>
             <MenuItem onClick={handleSettings}>
               <ListItemIcon>
                 <Settings fontSize="small" />
               </ListItemIcon>
-              <ListItemText>Configuración</ListItemText>
+              <ListItemText>Settings</ListItemText>
             </MenuItem>
             <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
               <ListItemIcon sx={{ color: 'error.main' }}>
                 <Logout fontSize="small" />
               </ListItemIcon>
-              <ListItemText>Cerrar Sesión</ListItemText>
+              <ListItemText>Sign Out</ListItemText>
             </MenuItem>
           </Menu>
         </Toolbar>
