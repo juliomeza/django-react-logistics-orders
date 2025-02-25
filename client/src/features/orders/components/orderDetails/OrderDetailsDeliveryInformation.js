@@ -12,6 +12,7 @@ const OrderDetailsDeliveryInformation = ({ formData, handleChange, contacts = []
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, sm: 6 }}>
           <SelectField
+            id="contact"
             label="Contact"
             name="contact"
             value={formData.contact}
@@ -24,6 +25,7 @@ const OrderDetailsDeliveryInformation = ({ formData, handleChange, contacts = []
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
+            id="expected_delivery_date"
             label="Expected Delivery Date"
             name="expected_delivery_date"
             type="date"
@@ -35,6 +37,7 @@ const OrderDetailsDeliveryInformation = ({ formData, handleChange, contacts = []
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
           <SelectField
+            id="shipping_address"
             label="Shipping Address"
             name="shipping_address"
             value={formData.shipping_address}
@@ -47,6 +50,7 @@ const OrderDetailsDeliveryInformation = ({ formData, handleChange, contacts = []
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
           <SelectField
+            id="billing_address"
             label="Billing Address"
             name="billing_address"
             value={formData.billing_address}

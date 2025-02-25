@@ -17,6 +17,7 @@ const OrderDetailsBasicOrderInformation = ({
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, sm: 6 }}>
           <SelectField
+            id="order_type"
             label="Order Type"
             name="order_type"
             value={formData.order_type}
@@ -29,6 +30,7 @@ const OrderDetailsBasicOrderInformation = ({
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
           <SelectField
+            id="order_class"
             label="Order Class"
             name="order_class"
             value={formData.order_class}
@@ -41,6 +43,7 @@ const OrderDetailsBasicOrderInformation = ({
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
+            id="lookup_code_order"
             label="Lookup Code Order"
             name="lookup_code_order"
             value={formData.lookup_code_order}
@@ -51,6 +54,7 @@ const OrderDetailsBasicOrderInformation = ({
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
+            id="lookup_code_shipment"
             label="Lookup Code Shipment"
             name="lookup_code_shipment"
             value={formData.lookup_code_shipment}

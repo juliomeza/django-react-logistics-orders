@@ -11,6 +11,7 @@ const OrderDetailsAdditionalInformation = ({ formData, handleChange }) => {
       <Grid container spacing={2}>
         <Grid size={12}>
           <TextField
+            id="notes"
             label="Notes"
             name="notes"
             value={formData.notes}

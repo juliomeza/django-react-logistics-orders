@@ -10,11 +10,13 @@ const SelectField = ({
   required = false,
   getOptionLabel,
   getOptionValue,
+  id = name,
   ...props
 }) => {
   return (
     <TextField
       select
+      id={id}
       label={label}
       name={name}
       value={value}
@@ -22,6 +24,12 @@ const SelectField = ({
       fullWidth
       required={required}
       slotProps={{
+        input: {
+          id: `${id}-input`,
+        },
+        htmlInput: {
+          id: `${id}-input`,
+        },
         select: {
           MenuProps: {
             disableScrollLock: true,

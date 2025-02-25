@@ -86,7 +86,7 @@ const Dashboard = () => {
           <Select
             labelId="status-filter-label"
             value={selectedStatus}
-            label="Filtrar por estado"
+            //label="Filtrar por estado"
             onChange={(e) => setSelectedStatus(e.target.value)}
           >
             <MenuItem value="all">All</MenuItem>

@@ -19,6 +19,7 @@ const OrderDetailsLogisticsInformation = ({
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, sm: 6 }}>
           <SelectField
+            id="warehouse"
             label="Warehouse"
             name="warehouse"
             value={formData.warehouse}
@@ -31,6 +32,7 @@ const OrderDetailsLogisticsInformation = ({
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
           <SelectField
+            id="project"
             label="Project"
             name="project"
             value={formData.project}
@@ -43,6 +45,7 @@ const OrderDetailsLogisticsInformation = ({
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
           <SelectField
+            id="carrier"
             label="Carrier"
             name="carrier"
             value={formData.carrier}
@@ -54,6 +57,7 @@ const OrderDetailsLogisticsInformation = ({
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
           <SelectField
+            id="service_type"
             label="Service Type"
             name="service_type"
             value={formData.service_type}
