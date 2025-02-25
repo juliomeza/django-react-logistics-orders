@@ -8,7 +8,6 @@ class Enterprise(TimeStampedModel):
     name = models.CharField(max_length=100)
     lookup_code = models.CharField(max_length=50, unique=True)
     is_active = models.BooleanField(default=True)
-    #status = models.ForeignKey(Status, on_delete=models.PROTECT, related_name="enterprises")
     address = models.ForeignKey(
         Address,
         on_delete=models.PROTECT,
@@ -57,7 +56,7 @@ class Project(TimeStampedModel):
     users = models.ManyToManyField(get_user_model(), related_name="projects")
     is_active = models.BooleanField(default=True)
     notes = models.TextField(blank=True)
-    # Relaciones opcionales con logística:
+    # Optional relationships with logistics:
     warehouses = models.ManyToManyField('logistics.Warehouse', related_name="projects", blank=True)
     carriers = models.ManyToManyField('logistics.Carrier', related_name="projects", blank=True)
     services = models.ManyToManyField('logistics.CarrierService', related_name="projects", blank=True)

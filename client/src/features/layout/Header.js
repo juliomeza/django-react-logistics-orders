@@ -20,14 +20,14 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import AuthContext from '../../features/auth/AuthContext';
 
 const Header = () => {
-  // Incluimos loading para controlar el renderizado
+  // Include loading to control rendering
   const { user, logout, loading } = useContext(AuthContext);
   const location = useLocation();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
 
   const fullName = user ? `${user.first_name} ${user.last_name}` : 'Guest User';
-  // Mientras loading sea true, mostramos cadena vacía
+  // While loading is true, display an empty string
   const clientName = !loading && user ? (user.client_name ? user.client_name : 'Company not defined') : '';
 
   const currentTab =
@@ -45,11 +45,11 @@ const Header = () => {
   };
   const handleProfile = () => {
     handleMenuClose();
-    // Lógica para ir a "Mi Perfil"
+    // Logic to navigate to "My Profile"
   };
   const handleSettings = () => {
     handleMenuClose();
-    // Lógica para ir a "Configuración"
+    // Logic to navigate to "Settings"
   };
   const handleTabChange = (event, newValue) => {
     if (newValue === 0) navigate('/dashboard');
@@ -60,7 +60,7 @@ const Header = () => {
     <AppBar position="fixed" color="default" elevation={1}>
       <Container maxWidth="lg">
         <Toolbar>
-          {/* Muestra el nombre del cliente solo cuando ya se cargó */}
+          {/* Display customer name only after it's loaded */}
           <Typography variant="h6" sx={{ mr: 4 }}>
             {clientName}
           </Typography>

@@ -1,4 +1,3 @@
-# server/config/urls.py
 from django.contrib import admin
 from django.urls import path, include, re_path
 from rest_framework import routers, permissions
@@ -16,7 +15,7 @@ schema_view = get_schema_view(
     openapi.Info(
         title="SupplyGrid API",
         default_version="v1",
-        description="Documentación de la API de órdenes y logística",
+        description="Orders and Logistics API Documentation",
         terms_of_service="https://www.example.com/terms/",
         contact=openapi.Contact(email="contacto@example.com"),
         license=openapi.License(name="Licencia MIT"),
