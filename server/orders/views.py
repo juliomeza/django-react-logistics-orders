@@ -21,7 +21,7 @@ class OrderClassViewSet(viewsets.ModelViewSet):
     serializer_class = OrderClassSerializer
 
 class OrderViewSet(viewsets.ModelViewSet):
-    # Agregamos un queryset por defecto para que el router pueda determinar el basename
+    # Add a default queryset so the router can determine the basename
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
@@ -29,7 +29,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         if not self.request.user.is_authenticated:
             return Order.objects.none()
         
-        # Filtramos las órdenes por los proyectos asociados al usuario.
+        # Filter orders by the projects associated with the user
         user_projects = self.request.user.projects.all()
         return Order.objects.filter(project__in=user_projects)
 

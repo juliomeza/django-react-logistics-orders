@@ -6,7 +6,7 @@ const StepperHeader = ({ activeStep, steps }) => {
     <Box
       sx={{
         position: 'fixed',
-        top: 64, // Ajusta según la altura del Header
+        top: 64,
         left: 0,
         right: 0,
         backgroundColor: 'white',

@@ -72,7 +72,6 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -127,7 +126,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Configurar CORS y autenticación
+# Configure CORS and authentication
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',  # React Frontend
 ]

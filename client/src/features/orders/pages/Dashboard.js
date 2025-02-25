@@ -32,7 +32,7 @@ const Dashboard = () => {
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [ordersError, setOrdersError] = useState('');
 
-  // Fetch de órdenes y estados
+  // Fetch orders and statuses
   useEffect(() => {
     const fetchData = async () => {
       try {

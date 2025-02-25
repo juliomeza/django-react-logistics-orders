@@ -13,7 +13,7 @@ class CustomUserAdmin(UserAdmin):  # Usa UserAdmin en lugar de ModelAdmin
     search_fields = ('email', 'first_name', 'last_name')
     list_filter = ()
 
-    # Orden y organización de los campos en el formulario de edición
+    # Order and organization of fields in the edit form
     fieldsets = (
         ("Personal Information", {'fields': ('first_name', 'last_name', 'email', 'password')}),
         ("User Details", {'fields': ('username', 'role')}),
@@ -21,7 +21,7 @@ class CustomUserAdmin(UserAdmin):  # Usa UserAdmin en lugar de ModelAdmin
         ("Fechas Importantes", {'fields': ('last_login', 'date_joined')}),
     )
 
-    # Orden en el formulario de creación de usuario en Django Admin
+    # Order in the user creation form in Django Admin
     add_fieldsets = (
         ("Personal Information", {
             'classes': ('wide',),

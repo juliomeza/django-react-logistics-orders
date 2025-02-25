@@ -22,7 +22,7 @@ class LoginView(APIView):
                 key='access_token',
                 value=str(access),
                 httponly=True,
-                secure=False,  # Usa True en producción con HTTPS
+                secure=False,  # Use True in production with HTTPS
                 samesite='Lax'
             )
             response.set_cookie(
