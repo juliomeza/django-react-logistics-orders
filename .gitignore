@@ -10,8 +10,8 @@ server/**/*.pyc
 server/**/__pycache__/
 
 # Django migration files
-server/*/migrations/*.py
-!server/*/migrations/__init__.py
+#server/*/migrations/*.py
+#!server/*/migrations/__init__.py
 
 # IDE configuration files (such as VS Code, PyCharm)
 .vscode/
