@@ -5,9 +5,12 @@ server/venv/
 # Django database files (if using SQLite)
 server/db.sqlite3
 
+# Django cache files (all levels)
+server/**/*.pyc
+server/**/__pycache__/
+
 # Django migration files
-server/*.pyc
-server/__pycache__/
+server/*/migrations/
 
 # IDE configuration files (such as VS Code, PyCharm)
 .vscode/
