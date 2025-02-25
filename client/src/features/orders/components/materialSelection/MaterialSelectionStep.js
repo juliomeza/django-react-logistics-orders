@@ -13,12 +13,9 @@ import {
   IconButton,
   InputAdornment,
   Box,
-  Chip,
-  Tooltip,
   CircularProgress
 } from '@mui/material';
 import { Search, Add, Remove } from '@mui/icons-material';
-import Grid from '@mui/material/Grid2';
 
 const MaterialSelectionStep = ({ 
   formData, 
@@ -36,11 +33,13 @@ const MaterialSelectionStep = ({
     if (!formData.selectedInventories) {
       setFormData(prev => ({ ...prev, selectedInventories: [] }));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Update the form data when selected items change
   useEffect(() => {
     setFormData(prev => ({ ...prev, selectedInventories: selectedItems }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedItems]);
 
   // Filter inventories based on search term
@@ -120,12 +119,14 @@ const MaterialSelectionStep = ({
             placeholder="Search by material, license plate, or location"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search />
-                </InputAdornment>
-              ),
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search />
+                  </InputAdornment>
+                ),
+              }
             }}
           />
         </Box>
@@ -200,11 +201,13 @@ const MaterialSelectionStep = ({
                                   handleQuantityChange(item.id, val);
                                 }
                               }}
-                              inputProps={{ 
-                                style: { textAlign: 'center' },
-                                min: 1,
-                                max: parseFloat(item.quantity),
-                                type: 'number'
+                              slotProps={{ 
+                                input: {
+                                  style: { textAlign: 'center' },
+                                  min: 1,
+                                  max: parseFloat(item.quantity),
+                                  type: 'number'
+                                }
                               }}
                               sx={{ width: '60px', mx: 1 }}
                             />

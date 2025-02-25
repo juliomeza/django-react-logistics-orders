@@ -10,7 +10,7 @@ import {
   TableRow,
   Divider,
 } from '@mui/material';
-import Grid2 from '@mui/material/Grid2';
+import Grid from '@mui/material/Grid2';
 
 const ReviewStep = ({ 
   formData,
@@ -84,78 +84,78 @@ const ReviewStep = ({
         <Typography variant="subtitle1" sx={{ mb: 1, mt: 2 }}>
           Basic Order Information
         </Typography>
-        <Grid2 container spacing={2}>
-          <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Typography variant="body2" color="text.secondary">Order Type</Typography>
             <Typography variant="body1">{getOrderTypeName(formData.order_type)}</Typography>
-          </Grid2>
-          <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Typography variant="body2" color="text.secondary">Order Class</Typography>
             <Typography variant="body1">{getOrderClassName(formData.order_class)}</Typography>
-          </Grid2>
-          <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Typography variant="body2" color="text.secondary">Lookup Code Order</Typography>
             <Typography variant="body1">{formData.lookup_code_order}</Typography>
-          </Grid2>
-          <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Typography variant="body2" color="text.secondary">Lookup Code Shipment</Typography>
             <Typography variant="body1">{formData.lookup_code_shipment}</Typography>
-          </Grid2>
-        </Grid2>
+          </Grid>
+        </Grid>
 
         <Divider sx={{ my: 2 }} />
         
         <Typography variant="subtitle1" sx={{ mb: 1 }}>
           Logistics Information
         </Typography>
-        <Grid2 container spacing={2}>
-          <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Typography variant="body2" color="text.secondary">Warehouse</Typography>
             <Typography variant="body1">{getWarehouseName(formData.warehouse)}</Typography>
-          </Grid2>
-          <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Typography variant="body2" color="text.secondary">Project</Typography>
             <Typography variant="body1">{getProjectName(formData.project)}</Typography>
-          </Grid2>
-          <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Typography variant="body2" color="text.secondary">Carrier</Typography>
             <Typography variant="body1">
               {formData.carrier ? getCarrierName(formData.carrier) : 'Not specified'}
             </Typography>
-          </Grid2>
-          <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Typography variant="body2" color="text.secondary">Service Type</Typography>
             <Typography variant="body1">
               {formData.service_type ? getServiceName(formData.service_type) : 'Not specified'}
             </Typography>
-          </Grid2>
-        </Grid2>
+          </Grid>
+        </Grid>
 
         <Divider sx={{ my: 2 }} />
         
         <Typography variant="subtitle1" sx={{ mb: 1 }}>
           Delivery Information
         </Typography>
-        <Grid2 container spacing={2}>
-          <Grid2 size={{ xs: 12, sm: 6 }}>
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="body2" color="text.secondary">Contact</Typography>
             <Typography variant="body1">{getContactName(formData.contact)}</Typography>
-          </Grid2>
-          <Grid2 size={{ xs: 12, sm: 6 }}>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="body2" color="text.secondary">Expected Delivery Date</Typography>
             <Typography variant="body1">
               {formData.expected_delivery_date || 'Not specified'}
             </Typography>
-          </Grid2>
-          <Grid2 size={{ xs: 12, sm: 6 }}>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="body2" color="text.secondary">Shipping Address</Typography>
             <Typography variant="body1">{getAddressLine(formData.shipping_address)}</Typography>
-          </Grid2>
-          <Grid2 size={{ xs: 12, sm: 6 }}>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="body2" color="text.secondary">Billing Address</Typography>
             <Typography variant="body1">{getAddressLine(formData.billing_address)}</Typography>
-          </Grid2>
-        </Grid2>
+          </Grid>
+        </Grid>
 
         {formData.notes && (
           <>
