@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextField, MenuItem } from '@mui/material';
+import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 
 const SelectField = ({
   label,
@@ -13,37 +13,29 @@ const SelectField = ({
   id = name,
   ...props
 }) => {
+  const labelId = `${id}-label`;
+  
   return (
-    <TextField
-      select
-      id={id}
-      label={label}
-      name={name}
-      value={value}
-      onChange={onChange}
-      fullWidth
-      required={required}
-      slotProps={{
-        input: {
-          id: `${id}-input`,
-        },
-        htmlInput: {
-          id: `${id}-input`,
-        },
-        select: {
-          MenuProps: {
-            disableScrollLock: true,
-          },
-        },
-      }}
-      {...props}
-    >
-      {options.map((option) => (
-        <MenuItem key={getOptionValue(option)} value={getOptionValue(option)}>
-          {getOptionLabel(option)}
-        </MenuItem>
-      ))}
-    </TextField>
+    <FormControl fullWidth required={required} {...props}>
+      <InputLabel id={labelId}>{label}</InputLabel>
+      <Select
+        labelId={labelId}
+        id={id}
+        name={name}
+        value={value}
+        onChange={onChange}
+        label={label}
+        MenuProps={{
+          disableScrollLock: true,
+        }}
+      >
+        {options.map((option) => (
+          <MenuItem key={getOptionValue(option)} value={getOptionValue(option)}>
+            {getOptionLabel(option)}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
   );
 };
 
