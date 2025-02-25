@@ -11,7 +11,7 @@ server/**/__pycache__/
 
 # Django migration files
 #server/*/migrations/
-#!server/*/migrations/__init__.py # Mantén el __init__.py para que Django detecte el módulo
+#!server/*/migrations/__init__.py # Keep __init__.py so Django can detect the module
 
 # IDE configuration files (such as VS Code, PyCharm)
 .vscode/
