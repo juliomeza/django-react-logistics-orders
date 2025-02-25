@@ -89,6 +89,7 @@ const Header = () => {
             onClose={handleMenuClose}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+            disableScrollLock={true}
           >
             <Box sx={{ px: 2, py: 1 }}>
               <Typography variant="subtitle1">{fullName}</Typography>
