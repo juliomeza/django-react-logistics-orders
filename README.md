@@ -200,5 +200,3 @@ The application includes several models that structure the database:
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
-
-Borrar esta linea
