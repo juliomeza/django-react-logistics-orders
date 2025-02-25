@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Container, Typography, Button, Box, Alert } from '@mui/material';
+import { Container, Typography, Button, Box, Alert, Snackbar } from '@mui/material';
 import { useNavigate, Navigate } from 'react-router-dom';
 import AuthContext from '../../auth/AuthContext';
 import OrderDetailsStep from '../components/orderDetails/OrderDetailsStep';
@@ -41,18 +41,20 @@ const MultiStepCreateOrder = () => {
   const [addresses, setAddresses] = useState([]);
   const [inventories, setInventories] = useState([]);
   const [materials, setMaterials] = useState([]);
-  
+
   // Loading states
   const [optionsLoading, setOptionsLoading] = useState(true);
   const [inventoriesLoading, setInventoriesLoading] = useState(true);
-  
-  // Error state
+
+  // Error states
   const [error, setError] = useState('');
+  const [formErrors, setFormErrors] = useState({});
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   // Load reference data
   useEffect(() => {
     if (!user) return;
-    
+
     const fetchReferenceData = async () => {
       setOptionsLoading(true);
       try {
@@ -91,18 +93,19 @@ const MultiStepCreateOrder = () => {
       } catch (error) {
         console.error('Error fetching reference data:', error);
         setError('Failed to load reference data. Please try again.');
+        setOpenSnackbar(true);
       } finally {
         setOptionsLoading(false);
       }
     };
-    
+
     fetchReferenceData();
   }, [user]);
-  
+
   // Load inventories and materials when warehouse changes
   useEffect(() => {
     if (!user || !formData.warehouse) return;
-    
+
     const fetchInventoriesAndMaterials = async () => {
       setInventoriesLoading(true);
       try {
@@ -110,27 +113,22 @@ const MultiStepCreateOrder = () => {
           apiProtected.get('inventories/'),
           apiProtected.get('materials/')
         ]);
-        
-        console.log('Fetched inventories:', inventoriesRes.data);
-        console.log('Fetched materials:', materialsRes.data);
-        
-        // Filter inventories by warehouse if needed
+
         const warehouseInventories = inventoriesRes.data.filter(
           inv => inv.warehouse === parseInt(formData.warehouse, 10)
         );
-        
-        console.log('Filtered inventories for warehouse:', warehouseInventories);
-        
+
         setInventories(warehouseInventories);
         setMaterials(materialsRes.data);
       } catch (error) {
         console.error('Error fetching inventories or materials:', error);
         setError('Failed to load inventory data. Please try again.');
+        setOpenSnackbar(true);
       } finally {
         setInventoriesLoading(false);
       }
     };
-    
+
     fetchInventoriesAndMaterials();
   }, [user, formData.warehouse]);
 
@@ -140,52 +138,58 @@ const MultiStepCreateOrder = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    // Limpiar errores al cambiar valor
+    setFormErrors(prev => ({ ...prev, [name]: false }));
   };
 
   const handleNext = () => {
-    // Validate the current step
+    let newErrors = {};
     if (currentStep === 0) {
-      // Validate order details
-      if (!formData.order_type || !formData.order_class || 
-          !formData.lookup_code_order || !formData.lookup_code_shipment ||
-          !formData.warehouse || !formData.project ||
-          !formData.contact || !formData.shipping_address || !formData.billing_address) {
+      // Validación de campos obligatorios en el paso 0
+      if (!formData.order_type) newErrors.order_type = true;
+      if (!formData.order_class) newErrors.order_class = true;
+      if (!formData.lookup_code_order) newErrors.lookup_code_order = true;
+      if (!formData.lookup_code_shipment) newErrors.lookup_code_shipment = true;
+      if (!formData.warehouse) newErrors.warehouse = true;
+      if (!formData.project) newErrors.project = true;
+      if (!formData.contact) newErrors.contact = true;
+      if (!formData.shipping_address) newErrors.shipping_address = true;
+      if (!formData.billing_address) newErrors.billing_address = true;
+
+      if (Object.keys(newErrors).length > 0) {
         setError('Please fill in all required fields before proceeding.');
+        setFormErrors(newErrors);
+        setOpenSnackbar(true);
         return;
       }
     } else if (currentStep === 1) {
-      // Validate materials selection
       if (!formData.selectedInventories || formData.selectedInventories.length === 0) {
         setError('Please select at least one material for this order.');
+        setOpenSnackbar(true);
         return;
       }
     }
-    
-    setError(''); // Clear any previous errors
+
+    setError('');
+    setFormErrors({});
     setCurrentStep(prev => prev + 1);
   };
 
   const handleBack = () => {
-    setError(''); // Clear any errors when going back
+    setError('');
+    setFormErrors({});
     setCurrentStep(prev => prev - 1);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Only proceed with submission if we're on the last step and the form was actually submitted
-    if (currentStep !== steps.length - 1) {
-      return;
-    }
-    
+    if (currentStep !== steps.length - 1) return;
+
     setError('');
-    
+    setFormErrors({});
+
     try {
-      // Add order_status - this was missing and probably causing the 400 error
-      // Default to the first order status (typically "New" or similar)
       const orderStatusId = await getFirstOrderStatus();
-      
-      // Create the order
       const orderData = {
         lookup_code_order: formData.lookup_code_order,
         lookup_code_shipment: formData.lookup_code_shipment,
@@ -200,16 +204,12 @@ const MultiStepCreateOrder = () => {
         service_type: formData.service_type || null,
         expected_delivery_date: formData.expected_delivery_date || null,
         notes: formData.notes || '',
-        order_status: orderStatusId // Add the order status
+        order_status: orderStatusId
       };
-      
-      console.log('Submitting order data:', orderData);
-      
-      // Submit the order
+
       const orderResponse = await apiProtected.post('orders/', orderData);
       const orderId = orderResponse.data.id;
-      
-      // Create the order lines for each selected inventory item
+
       const orderLinePromises = formData.selectedInventories.map(item => {
         const orderLineData = {
           order: orderId,
@@ -219,46 +219,34 @@ const MultiStepCreateOrder = () => {
         };
         return apiProtected.post('order-lines/', orderLineData);
       });
-      
+
       await Promise.all(orderLinePromises);
-      
-      // Redirect to dashboard after successful creation
       navigate('/dashboard');
     } catch (error) {
       console.error('Error submitting order:', error);
-      // Extract and display the specific error message if available
       if (error.response && error.response.data) {
         const errorData = error.response.data;
-        console.log('Server error details:', errorData);
-        
-        if (typeof errorData === 'object') {
-          // For field-specific errors
-          const errorMessages = Object.entries(errorData)
-            .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
-            .join('\n');
-          setError(`Failed to create order: \n${errorMessages}`);
-        } else {
-          setError(`Failed to create order: ${errorData}`);
-        }
+        const errorMessages = Object.entries(errorData)
+          .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
+          .join('\n');
+        setError(`Failed to create order: \n${errorMessages}`);
       } else {
         setError('Failed to create order. Please check your input and try again.');
       }
+      setOpenSnackbar(true);
     }
   };
-  
-  // Helper function to get the first order status (usually "New" or similar)
+
   const getFirstOrderStatus = async () => {
     try {
       const response = await apiProtected.get('order-statuses/');
       if (response.data && response.data.length > 0) {
         return response.data[0].id;
       }
-      // Fallback in case no statuses are available
       throw new Error('No order statuses found');
     } catch (error) {
       console.error('Error fetching order statuses:', error);
-      // Return a likely valid ID as fallback (adjust as needed)
-      return 1;
+      return 1; // Fallback
     }
   };
 
@@ -269,7 +257,7 @@ const MultiStepCreateOrder = () => {
       </Container>
     );
   }
-  
+
   if (!user) {
     return <Navigate to="/login" />;
   }
@@ -289,6 +277,7 @@ const MultiStepCreateOrder = () => {
             carrierServices={carrierServices}
             contacts={contacts}
             addresses={addresses}
+            formErrors={formErrors} // Pasar errores al componente
           />
         );
       case 1:
@@ -323,50 +312,35 @@ const MultiStepCreateOrder = () => {
 
   return (
     <>
-      {/* Fixed component for the Stepper */}
       <StepperHeader activeStep={currentStep} steps={steps} />
-      
-      {/* Add top margin so the content is not hidden behind the Stepper */}
       <Container sx={{ mt: 12, mb: 4 }}>
-        {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {error}
-          </Alert>
-        )}
-        
-        {/* Note: Removed onSubmit to prevent auto-submission */}
         <form>
           {renderStepContent(currentStep)}
-          
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-            <Button 
-              variant="outlined" 
-              onClick={handleBack} 
+            <Button
+              variant="outlined"
+              onClick={handleBack}
               disabled={currentStep === 0}
             >
               Back
             </Button>
-            
             {currentStep < steps.length - 1 ? (
-              <Button 
-                variant="contained" 
+              <Button
+                variant="contained"
                 onClick={handleNext}
                 disabled={
-                  (currentStep === 0 && optionsLoading) || 
+                  (currentStep === 0 && optionsLoading) ||
                   (currentStep === 1 && inventoriesLoading)
                 }
               >
                 Next
               </Button>
             ) : (
-              <Button 
-                onClick={handleSubmit} 
-                variant="contained" 
+              <Button
+                onClick={handleSubmit}
+                variant="contained"
                 color="primary"
-                disabled={
-                  !formData.selectedInventories || 
-                  formData.selectedInventories.length === 0
-                }
+                disabled={!formData.selectedInventories || formData.selectedInventories.length === 0}
               >
                 Create Order
               </Button>
@@ -374,6 +348,16 @@ const MultiStepCreateOrder = () => {
           </Box>
         </form>
       </Container>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="error" onClose={() => setOpenSnackbar(false)}>
+          {error}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

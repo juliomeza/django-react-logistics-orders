@@ -3,7 +3,13 @@ import { Paper, Typography, TextField } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import SelectField from '../SelectField';
 
-const OrderDetailsDeliveryInformation = ({ formData, handleChange, contacts = [], addresses = [] }) => {
+const OrderDetailsDeliveryInformation = ({
+  formData,
+  handleChange,
+  contacts = [],
+  addresses = [],
+  formErrors = {} // Añadimos formErrors como prop
+}) => {
   return (
     <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
       <Typography variant="subtitle1" sx={{ mb: 2 }}>
@@ -21,6 +27,8 @@ const OrderDetailsDeliveryInformation = ({ formData, handleChange, contacts = []
             options={contacts || []}
             getOptionLabel={(option) => `${option.first_name} ${option.last_name}`}
             getOptionValue={(option) => option.id}
+            error={formErrors.contact}
+            helperText={formErrors.contact && "This field is required"}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
@@ -46,6 +54,8 @@ const OrderDetailsDeliveryInformation = ({ formData, handleChange, contacts = []
             options={addresses || []}
             getOptionLabel={(option) => option.address_line_1}
             getOptionValue={(option) => option.id}
+            error={formErrors.shipping_address}
+            helperText={formErrors.shipping_address && "This field is required"}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
@@ -59,6 +69,8 @@ const OrderDetailsDeliveryInformation = ({ formData, handleChange, contacts = []
             options={addresses || []}
             getOptionLabel={(option) => option.address_line_1}
             getOptionValue={(option) => option.id}
+            error={formErrors.billing_address}
+            helperText={formErrors.billing_address && "This field is required"}
           />
         </Grid>
       </Grid>

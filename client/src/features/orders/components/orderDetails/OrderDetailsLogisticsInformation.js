@@ -9,7 +9,8 @@ const OrderDetailsLogisticsInformation = ({
   warehouses = [],
   projects = [],
   carriers = [],
-  carrierServices = []
+  carrierServices = [],
+  formErrors = {} // Añadimos formErrors como prop
 }) => {
   return (
     <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
@@ -28,6 +29,8 @@ const OrderDetailsLogisticsInformation = ({
             options={warehouses || []}
             getOptionLabel={(option) => option.name}
             getOptionValue={(option) => option.id}
+            error={formErrors.warehouse}
+            helperText={formErrors.warehouse && "This field is required"}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
@@ -41,6 +44,8 @@ const OrderDetailsLogisticsInformation = ({
             options={projects || []}
             getOptionLabel={(option) => option.name}
             getOptionValue={(option) => option.id}
+            error={formErrors.project}
+            helperText={formErrors.project && "This field is required"}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>

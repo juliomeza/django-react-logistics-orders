@@ -7,7 +7,8 @@ const OrderDetailsBasicOrderInformation = ({
   formData,
   handleChange,
   orderTypes = [],
-  orderClasses = []
+  orderClasses = [],
+  formErrors = {} // Añadimos formErrors como prop
 }) => {
   return (
     <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
@@ -26,6 +27,8 @@ const OrderDetailsBasicOrderInformation = ({
             options={orderTypes || []}
             getOptionLabel={(option) => option.type_name}
             getOptionValue={(option) => option.id}
+            error={formErrors.order_type} // Indicamos error si existe
+            helperText={formErrors.order_type && "This field is required"}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
@@ -39,6 +42,8 @@ const OrderDetailsBasicOrderInformation = ({
             options={orderClasses || []}
             getOptionLabel={(option) => option.class_name}
             getOptionValue={(option) => option.id}
+            error={formErrors.order_class}
+            helperText={formErrors.order_class && "This field is required"}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
@@ -50,6 +55,8 @@ const OrderDetailsBasicOrderInformation = ({
             onChange={handleChange}
             fullWidth
             required
+            error={formErrors.lookup_code_order}
+            helperText={formErrors.lookup_code_order && "This field is required"}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
@@ -61,6 +68,8 @@ const OrderDetailsBasicOrderInformation = ({
             onChange={handleChange}
             fullWidth
             required
+            error={formErrors.lookup_code_shipment}
+            helperText={formErrors.lookup_code_shipment && "This field is required"}
           />
         </Grid>
       </Grid>

@@ -14,7 +14,8 @@ const OrderDetailsStep = ({
   carriers,
   carrierServices,
   contacts,
-  addresses
+  addresses,
+  formErrors // Añadimos formErrors como prop
 }) => {
   return (
     <>
@@ -23,6 +24,7 @@ const OrderDetailsStep = ({
         handleChange={handleChange}
         orderTypes={orderTypes}
         orderClasses={orderClasses}
+        formErrors={formErrors} // Pasamos formErrors
       />
       <OrderDetailsLogisticsInformation
         formData={formData}
@@ -31,16 +33,19 @@ const OrderDetailsStep = ({
         projects={projects}
         carriers={carriers}
         carrierServices={carrierServices}
+        formErrors={formErrors} // Pasamos formErrors
       />
       <OrderDetailsDeliveryInformation
         formData={formData}
         handleChange={handleChange}
         contacts={contacts}
         addresses={addresses}
+        formErrors={formErrors} // Pasamos formErrors
       />
       <OrderDetailsAdditionalInformation
         formData={formData}
         handleChange={handleChange}
+        formErrors={formErrors} // Pasamos formErrors (aunque no sea obligatorio aquí)
       />
     </>
   );
