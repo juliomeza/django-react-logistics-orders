@@ -12,9 +12,8 @@ const MultiStepCreateOrder = () => {
   const { user, loading } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // Form state
   const [formData, setFormData] = useState({
-    lookup_code_order: '', // For display only
+    lookup_code_order: '',
     reference_number: '',
     notes: '',
     order_type: '',
@@ -30,10 +29,7 @@ const MultiStepCreateOrder = () => {
     selectedInventories: []
   });
 
-  // State to store the created order ID
   const [orderId, setOrderId] = useState(null);
-
-  // States for options
   const [orderTypes, setOrderTypes] = useState([]);
   const [orderClasses, setOrderClasses] = useState([]);
   const [warehouses, setWarehouses] = useState([]);
@@ -44,20 +40,14 @@ const MultiStepCreateOrder = () => {
   const [addresses, setAddresses] = useState([]);
   const [inventories, setInventories] = useState([]);
   const [materials, setMaterials] = useState([]);
-
-  // Loading states
   const [optionsLoading, setOptionsLoading] = useState(true);
   const [inventoriesLoading, setInventoriesLoading] = useState(true);
-
-  // Error states
   const [error, setError] = useState('');
   const [formErrors, setFormErrors] = useState({});
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
-  // Load reference data
   useEffect(() => {
     if (!user) return;
-
     const fetchReferenceData = async () => {
       setOptionsLoading(true);
       try {
@@ -101,14 +91,11 @@ const MultiStepCreateOrder = () => {
         setOptionsLoading(false);
       }
     };
-
     fetchReferenceData();
   }, [user]);
 
-  // Load inventories and materials when warehouse changes
   useEffect(() => {
     if (!user || !formData.warehouse) return;
-
     const fetchInventoriesAndMaterials = async () => {
       setInventoriesLoading(true);
       try {
@@ -116,11 +103,9 @@ const MultiStepCreateOrder = () => {
           apiProtected.get('inventories/'),
           apiProtected.get('materials/')
         ]);
-
         const warehouseInventories = inventoriesRes.data.filter(
           inv => inv.warehouse === parseInt(formData.warehouse, 10)
         );
-
         setInventories(warehouseInventories);
         setMaterials(materialsRes.data);
       } catch (error) {
@@ -131,7 +116,6 @@ const MultiStepCreateOrder = () => {
         setInventoriesLoading(false);
       }
     };
-
     fetchInventoriesAndMaterials();
   }, [user, formData.warehouse]);
 
@@ -144,9 +128,42 @@ const MultiStepCreateOrder = () => {
     setFormErrors(prev => ({ ...prev, [name]: false }));
   };
 
+  // Step 2: Function to save order lines (delete existing lines first)
+  const saveOrderLines = async () => {
+    if (!formData.selectedInventories || formData.selectedInventories.length === 0) {
+      setError('Please select at least one material before saving.');
+      setOpenSnackbar(true);
+      return;
+    }
+    try {
+      // Delete all existing order lines for this order
+      await apiProtected.delete(`order-lines/order/${orderId}/clear/`);
+
+      // Save the current selected inventories as new lines
+      const orderLinePromises = formData.selectedInventories.map(item => {
+        const orderLineData = {
+          order: orderId,
+          material: item.material,
+          quantity: item.orderQuantity || 1,
+          license_plate: item.id
+        };
+        return apiProtected.post('order-lines/', orderLineData);
+      });
+      await Promise.all(orderLinePromises);
+      setError('Materials saved successfully.');
+      setOpenSnackbar(true);
+    } catch (error) {
+      console.error('Error saving order lines:', error);
+      setError('Failed to save materials. Please try again.');
+      setOpenSnackbar(true);
+    }
+  };
+
+  // Step 1 and 2: Handle navigation and order creation
   const handleNext = async () => {
     let newErrors = {};
     if (currentStep === 0) {
+      // Step 1: Create the order
       if (!formData.order_type) newErrors.order_type = true;
       if (!formData.order_class) newErrors.order_class = true;
       if (!formData.project) newErrors.project = true;
@@ -154,14 +171,14 @@ const MultiStepCreateOrder = () => {
       if (!formData.contact) newErrors.contact = true;
       if (!formData.shipping_address) newErrors.shipping_address = true;
       if (!formData.billing_address) newErrors.billing_address = true;
-  
+
       if (Object.keys(newErrors).length > 0) {
         setError('Please fill in all required fields before proceeding.');
         setFormErrors(newErrors);
         setOpenSnackbar(true);
         return;
       }
-  
+
       try {
         const orderStatusId = await getFirstOrderStatus();
         const orderData = {
@@ -179,8 +196,8 @@ const MultiStepCreateOrder = () => {
           notes: formData.notes || '',
           order_status: orderStatusId
         };
-  
-        console.log('Sending order data:', orderData); // Log para depurar datos enviados
+
+        console.log('Sending order data:', orderData); // Debug data being sent
         const orderResponse = await apiProtected.post('orders/', orderData);
         setOrderId(orderResponse.data.id);
         setFormData(prev => ({
@@ -201,13 +218,11 @@ const MultiStepCreateOrder = () => {
         return;
       }
     } else if (currentStep === 1) {
-      if (!formData.selectedInventories || formData.selectedInventories.length === 0) {
-        setError('Please select at least one material for this order.');
-        setOpenSnackbar(true);
-        return;
-      }
+      // Step 2: Save materials before moving to Review
+      await saveOrderLines();
+      if (openSnackbar && error.includes('Failed')) return; // Stop if save fails
     }
-  
+
     setError('');
     setFormErrors({});
     setCurrentStep(prev => prev + 1);
@@ -219,6 +234,14 @@ const MultiStepCreateOrder = () => {
     setCurrentStep(prev => prev - 1);
   };
 
+  // Step 2: Handle Save button
+  const handleSave = async () => {
+    if (currentStep === 1) {
+      await saveOrderLines();
+    }
+  };
+
+  // Step 3: Submit the order and change status to "Submitted"
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (currentStep !== steps.length - 1) return;
@@ -227,25 +250,27 @@ const MultiStepCreateOrder = () => {
     setFormErrors({});
 
     try {
-      // Submit order lines
-      const orderLinePromises = formData.selectedInventories.map(item => {
-        const orderLineData = {
-          order: orderId,
-          material: item.material,
-          quantity: item.orderQuantity || 1,
-          license_plate: item.id
-        };
-        return apiProtected.post('order-lines/', orderLineData);
+      // Submit order lines (ensure all are saved)
+      await saveOrderLines(); // This will overwrite existing lines
+      if (openSnackbar && error.includes('Failed')) throw new Error('Failed to save lines');
+
+      // Update order status to "Submitted" using PATCH
+      const submittedStatusId = await getSubmittedOrderStatus();
+      await apiProtected.patch(`orders/${orderId}/`, {
+        order_status: submittedStatusId
       });
 
-      await Promise.all(orderLinePromises);
-
-      // Update order status to "Submitted" (to be implemented later)
-      // For now, just navigate
       navigate('/dashboard');
     } catch (error) {
-      console.error('Error submitting order lines:', error);
-      setError('Failed to submit order lines. Please try again.');
+      console.error('Error submitting order:', error);
+      if (error.response && error.response.data) {
+        const errorMessages = Object.entries(error.response.data)
+          .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
+          .join('\n');
+        setError(`Failed to submit order: \n${errorMessages}`);
+      } else {
+        setError('Failed to submit order. Please try again.');
+      }
       setOpenSnackbar(true);
     }
   };
@@ -253,13 +278,24 @@ const MultiStepCreateOrder = () => {
   const getFirstOrderStatus = async () => {
     try {
       const response = await apiProtected.get('order-statuses/');
-      if (response.data && response.data.length > 0) {
-        return response.data[0].id; // Assuming this is "Created" for now
-      }
-      throw new Error('No order statuses found');
+      const createdStatus = response.data.find(status => status.status_name === 'Created');
+      if (createdStatus) return createdStatus.id;
+      throw new Error('Created status not found');
     } catch (error) {
       console.error('Error fetching order statuses:', error);
       return 1; // Fallback
+    }
+  };
+
+  const getSubmittedOrderStatus = async () => {
+    try {
+      const response = await apiProtected.get('order-statuses/');
+      const submittedStatus = response.data.find(status => status.status_name === 'Submitted');
+      if (submittedStatus) return submittedStatus.id;
+      throw new Error('Submitted status not found');
+    } catch (error) {
+      console.error('Error fetching submitted status:', error);
+      return 2; // Fallback to ID 2
     }
   };
 
@@ -278,6 +314,7 @@ const MultiStepCreateOrder = () => {
   const renderStepContent = (step) => {
     switch (step) {
       case 0:
+        // Step 1: Order Details
         return (
           <OrderDetailsStep
             formData={formData}
@@ -294,6 +331,7 @@ const MultiStepCreateOrder = () => {
           />
         );
       case 1:
+        // Step 2: Materials Selection
         return (
           <MaterialSelectionStep
             formData={formData}
@@ -304,6 +342,7 @@ const MultiStepCreateOrder = () => {
           />
         );
       case 2:
+        // Step 3: Review
         return (
           <ReviewStep
             formData={formData}
@@ -337,27 +376,41 @@ const MultiStepCreateOrder = () => {
             >
               Back
             </Button>
-            {currentStep < steps.length - 1 ? (
-              <Button
-                variant="contained"
-                onClick={handleNext}
-                disabled={
-                  (currentStep === 0 && optionsLoading) ||
-                  (currentStep === 1 && inventoriesLoading)
-                }
-              >
-                Next
-              </Button>
-            ) : (
-              <Button
-                onClick={handleSubmit}
-                variant="contained"
-                color="primary"
-                disabled={!formData.selectedInventories || formData.selectedInventories.length === 0}
-              >
-                Submit Order
-              </Button>
-            )}
+            <Box>
+              {currentStep === 1 && (
+                // Step 2: Save button
+                <Button
+                  variant="outlined"
+                  onClick={handleSave}
+                  sx={{ mr: 2 }}
+                  disabled={inventoriesLoading}
+                >
+                  Save
+                </Button>
+              )}
+              {currentStep < steps.length - 1 ? (
+                <Button
+                  variant="contained"
+                  onClick={handleNext}
+                  disabled={
+                    (currentStep === 0 && optionsLoading) ||
+                    (currentStep === 1 && inventoriesLoading)
+                  }
+                >
+                  Next
+                </Button>
+              ) : (
+                // Step 3: Submit button
+                <Button
+                  onClick={handleSubmit}
+                  variant="contained"
+                  color="primary"
+                  disabled={!formData.selectedInventories || formData.selectedInventories.length === 0}
+                >
+                  Submit Order
+                </Button>
+              )}
+            </Box>
           </Box>
         </form>
       </Container>
@@ -367,7 +420,10 @@ const MultiStepCreateOrder = () => {
         onClose={() => setOpenSnackbar(false)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert severity="error" onClose={() => setOpenSnackbar(false)}>
+        <Alert
+          severity={error.includes('Failed') ? 'error' : 'success'}
+          onClose={() => setOpenSnackbar(false)}
+        >
           {error}
         </Alert>
       </Snackbar>
