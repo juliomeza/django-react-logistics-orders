@@ -204,6 +204,8 @@ const MultiStepCreateOrder = () => {
           ...prev,
           lookup_code_order: orderResponse.data.lookup_code_order
         }));
+        setError('Order created successfully.'); // Success message for Step 1
+        setOpenSnackbar(true);
       } catch (error) {
         console.error('Error creating order:', error);
         if (error.response && error.response.data) {
@@ -221,9 +223,10 @@ const MultiStepCreateOrder = () => {
       // Step 2: Save materials before moving to Review
       await saveOrderLines();
       if (openSnackbar && error.includes('Failed')) return; // Stop if save fails
+      setError('Materials saved.'); // Success message for Step 2 to Step 3
+      setOpenSnackbar(true);
     }
 
-    setError('');
     setFormErrors({});
     setCurrentStep(prev => prev + 1);
   };
@@ -260,7 +263,13 @@ const MultiStepCreateOrder = () => {
         order_status: submittedStatusId
       });
 
-      navigate('/dashboard');
+      setError('Order submitted successfully.'); // Success message for Submit
+      setOpenSnackbar(true);
+      
+      // Delay navigation to show the message for 2 seconds
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 2000);
     } catch (error) {
       console.error('Error submitting order:', error);
       if (error.response && error.response.data) {
@@ -421,7 +430,11 @@ const MultiStepCreateOrder = () => {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
         <Alert
-          severity={error.includes('Failed') ? 'error' : 'success'}
+          severity={
+            error.includes('Failed') || error.includes('Please fill in all required fields') 
+              ? 'error' 
+              : 'success'
+          }
           onClose={() => setOpenSnackbar(false)}
         >
           {error}
