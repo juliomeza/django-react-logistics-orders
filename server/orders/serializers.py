@@ -10,7 +10,7 @@ class OrderTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderType
         fields = '__all__'
-
+        
 class OrderClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderClass
@@ -21,6 +21,7 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = '__all__'
+        read_only_fields = ['lookup_code_order', 'lookup_code_shipment']
 
 class OrderLineSerializer(serializers.ModelSerializer):
     class Meta:

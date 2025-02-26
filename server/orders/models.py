@@ -4,6 +4,7 @@ from enterprise.models import Project
 from logistics.models import Warehouse, Contact, Address, Carrier, CarrierService
 from materials.models import Material
 from inventory.models import Inventory, InventorySerialNumber
+from django.db import transaction
 
 class OrderStatus(TimeStampedModel):
     status_name = models.CharField(max_length=50)
@@ -32,6 +33,30 @@ class OrderClass(TimeStampedModel):
 
     def __str__(self):
         return self.class_name
+
+class OrderCounter(TimeStampedModel):
+    project = models.OneToOneField(
+        Project,
+        on_delete=models.CASCADE,
+        related_name="counter",
+        help_text="Project associated with this order counter"
+    )
+    last_number = models.PositiveIntegerField(
+        default=0,
+        help_text="Last order number used for this project"
+    )
+
+    def __str__(self):
+        return f"Counter for {self.project.name}"
+
+    def get_next_number(self):
+        """Returns the next number and updates the counter."""
+        with transaction.atomic():
+            # Blocks it to avoid concurrency conflicts
+            counter = OrderCounter.objects.select_for_update().get(id=self.id)
+            counter.last_number += 1
+            counter.save()
+            return counter.last_number
 
 class Order(TimeStampedModel):
     lookup_code_order = models.CharField(
@@ -62,6 +87,23 @@ class Order(TimeStampedModel):
     service_type = models.ForeignKey(CarrierService, on_delete=models.PROTECT, related_name='orders', null=True, blank=True)
     expected_delivery_date = models.DateTimeField(null=True, blank=True)
     notes = models.TextField(blank=True)
+
+    def generate_order_code(self):
+        """Genera el código de orden y envío basado en el prefijo del proyecto y el contador."""
+        counter, _ = OrderCounter.objects.get_or_create(project=self.project)
+        next_number = counter.get_next_number()
+        code = f"{self.project.orders_prefix}-{str(next_number).zfill(6)}"
+        return code
+
+    def save(self, *args, **kwargs):
+        """Genera automáticamente lookup_code_order y lookup_code_shipment si no están definidos."""
+        if not self.lookup_code_order or not self.lookup_code_shipment:
+            generated_code = self.generate_order_code()
+            if not self.lookup_code_order:
+                self.lookup_code_order = generated_code
+            if not self.lookup_code_shipment:
+                self.lookup_code_shipment = generated_code
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.order_type} - {self.lookup_code_order}"

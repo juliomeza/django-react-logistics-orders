@@ -14,8 +14,7 @@ const MultiStepCreateOrder = () => {
 
   // Form state
   const [formData, setFormData] = useState({
-    lookup_code_order: '',
-    lookup_code_shipment: '',
+    lookup_code_order: '', // For display only
     reference_number: '',
     notes: '',
     order_type: '',
@@ -30,6 +29,9 @@ const MultiStepCreateOrder = () => {
     billing_address: '',
     selectedInventories: []
   });
+
+  // State to store the created order ID
+  const [orderId, setOrderId] = useState(null);
 
   // States for options
   const [orderTypes, setOrderTypes] = useState([]);
@@ -139,27 +141,62 @@ const MultiStepCreateOrder = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    // Limpiar errores al cambiar valor
     setFormErrors(prev => ({ ...prev, [name]: false }));
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     let newErrors = {};
     if (currentStep === 0) {
-      // Validación de campos obligatorios en el paso 0
       if (!formData.order_type) newErrors.order_type = true;
       if (!formData.order_class) newErrors.order_class = true;
-      if (!formData.lookup_code_order) newErrors.lookup_code_order = true;
-      if (!formData.lookup_code_shipment) newErrors.lookup_code_shipment = true;
-      if (!formData.warehouse) newErrors.warehouse = true;
       if (!formData.project) newErrors.project = true;
+      if (!formData.warehouse) newErrors.warehouse = true;
       if (!formData.contact) newErrors.contact = true;
       if (!formData.shipping_address) newErrors.shipping_address = true;
       if (!formData.billing_address) newErrors.billing_address = true;
-
+  
       if (Object.keys(newErrors).length > 0) {
         setError('Please fill in all required fields before proceeding.');
         setFormErrors(newErrors);
+        setOpenSnackbar(true);
+        return;
+      }
+  
+      try {
+        const orderStatusId = await getFirstOrderStatus();
+        const orderData = {
+          reference_number: formData.reference_number || null,
+          order_type: formData.order_type,
+          order_class: formData.order_class,
+          project: formData.project,
+          warehouse: formData.warehouse,
+          contact: formData.contact,
+          shipping_address: formData.shipping_address,
+          billing_address: formData.billing_address,
+          carrier: formData.carrier || null,
+          service_type: formData.service_type || null,
+          expected_delivery_date: formData.expected_delivery_date || null,
+          notes: formData.notes || '',
+          order_status: orderStatusId
+        };
+  
+        console.log('Sending order data:', orderData); // Log para depurar datos enviados
+        const orderResponse = await apiProtected.post('orders/', orderData);
+        setOrderId(orderResponse.data.id);
+        setFormData(prev => ({
+          ...prev,
+          lookup_code_order: orderResponse.data.lookup_code_order
+        }));
+      } catch (error) {
+        console.error('Error creating order:', error);
+        if (error.response && error.response.data) {
+          const errorMessages = Object.entries(error.response.data)
+            .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
+            .join('\n');
+          setError(`Failed to create order: \n${errorMessages}`);
+        } else {
+          setError('Failed to create order. Please try again.');
+        }
         setOpenSnackbar(true);
         return;
       }
@@ -170,7 +207,7 @@ const MultiStepCreateOrder = () => {
         return;
       }
     }
-
+  
     setError('');
     setFormErrors({});
     setCurrentStep(prev => prev + 1);
@@ -190,28 +227,7 @@ const MultiStepCreateOrder = () => {
     setFormErrors({});
 
     try {
-      const orderStatusId = await getFirstOrderStatus();
-      const orderData = {
-        lookup_code_order: formData.lookup_code_order,
-        lookup_code_shipment: formData.lookup_code_shipment,
-        reference_number: formData.reference_number || null,
-        order_type: formData.order_type,
-        order_class: formData.order_class,
-        project: formData.project,
-        warehouse: formData.warehouse,
-        contact: formData.contact,
-        shipping_address: formData.shipping_address,
-        billing_address: formData.billing_address,
-        carrier: formData.carrier || null,
-        service_type: formData.service_type || null,
-        expected_delivery_date: formData.expected_delivery_date || null,
-        notes: formData.notes || '',
-        order_status: orderStatusId
-      };
-
-      const orderResponse = await apiProtected.post('orders/', orderData);
-      const orderId = orderResponse.data.id;
-
+      // Submit order lines
       const orderLinePromises = formData.selectedInventories.map(item => {
         const orderLineData = {
           order: orderId,
@@ -223,18 +239,13 @@ const MultiStepCreateOrder = () => {
       });
 
       await Promise.all(orderLinePromises);
+
+      // Update order status to "Submitted" (to be implemented later)
+      // For now, just navigate
       navigate('/dashboard');
     } catch (error) {
-      console.error('Error submitting order:', error);
-      if (error.response && error.response.data) {
-        const errorData = error.response.data;
-        const errorMessages = Object.entries(errorData)
-          .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
-          .join('\n');
-        setError(`Failed to create order: \n${errorMessages}`);
-      } else {
-        setError('Failed to create order. Please check your input and try again.');
-      }
+      console.error('Error submitting order lines:', error);
+      setError('Failed to submit order lines. Please try again.');
       setOpenSnackbar(true);
     }
   };
@@ -243,7 +254,7 @@ const MultiStepCreateOrder = () => {
     try {
       const response = await apiProtected.get('order-statuses/');
       if (response.data && response.data.length > 0) {
-        return response.data[0].id;
+        return response.data[0].id; // Assuming this is "Created" for now
       }
       throw new Error('No order statuses found');
     } catch (error) {
@@ -279,7 +290,7 @@ const MultiStepCreateOrder = () => {
             carrierServices={carrierServices}
             contacts={contacts}
             addresses={addresses}
-            formErrors={formErrors} // Pasar errores al componente
+            formErrors={formErrors}
           />
         );
       case 1:
@@ -344,7 +355,7 @@ const MultiStepCreateOrder = () => {
                 color="primary"
                 disabled={!formData.selectedInventories || formData.selectedInventories.length === 0}
               >
-                Create Order
+                Submit Order
               </Button>
             )}
           </Box>

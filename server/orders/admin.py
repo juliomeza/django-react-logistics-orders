@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import OrderClass, OrderType, OrderStatus, Order, OrderLine
+from .models import OrderClass, OrderType, OrderStatus, Order, OrderLine, OrderCounter
 
 @admin.register(OrderStatus)
 class OrderClassAdmin(admin.ModelAdmin):
@@ -25,3 +25,8 @@ class OrderAdmin(admin.ModelAdmin):
 class OrderLineAdmin(admin.ModelAdmin):
     list_display = ('order', 'material', 'quantity')
     search_fields = ('order__lookup_code_order', 'material__name')
+
+@admin.register(OrderCounter)
+class OrderCounterAdmin(admin.ModelAdmin):
+    list_display = ('project', 'last_number')
+    search_fields = ('project__name',)

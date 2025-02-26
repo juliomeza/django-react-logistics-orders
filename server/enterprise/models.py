@@ -40,6 +40,7 @@ class Client(TimeStampedModel):
         return self.name
 
 class Project(TimeStampedModel):
+    is_active = models.BooleanField(default=True)
     name = models.CharField(max_length=100)
     lookup_code = models.CharField(max_length=50, unique=True)
     orders_prefix = models.CharField(
@@ -54,13 +55,14 @@ class Project(TimeStampedModel):
         related_name="projects"
     )
     users = models.ManyToManyField(get_user_model(), related_name="projects")
-    is_active = models.BooleanField(default=True)
-    notes = models.TextField(blank=True)
+    
     # Optional relationships with logistics:
     warehouses = models.ManyToManyField('logistics.Warehouse', related_name="projects", blank=True)
     carriers = models.ManyToManyField('logistics.Carrier', related_name="projects", blank=True)
     services = models.ManyToManyField('logistics.CarrierService', related_name="projects", blank=True)
     contacts = models.ManyToManyField('logistics.Contact', related_name="projects", blank=True)
+
+    notes = models.TextField(blank=True)
 
     def __str__(self):
         return self.name
