@@ -150,7 +150,7 @@ const MultiStepCreateOrder = () => {
         return apiProtected.post('order-lines/', orderLineData);
       });
       await Promise.all(orderLinePromises);
-      setError('Materials saved successfully.');
+      setError('Materials saved successfully');
       setOpenSnackbar(true);
     } catch (error) {
       console.error('Error saving order lines:', error);
@@ -204,7 +204,7 @@ const MultiStepCreateOrder = () => {
           ...prev,
           lookup_code_order: orderResponse.data.lookup_code_order
         }));
-        setError('Order created successfully.'); // Success message for Step 1
+        setError('Order created successfully'); // Success message for Step 1
         setOpenSnackbar(true);
       } catch (error) {
         console.error('Error creating order:', error);
@@ -221,9 +221,14 @@ const MultiStepCreateOrder = () => {
       }
     } else if (currentStep === 1) {
       // Step 2: Save materials before moving to Review
+      if (!formData.selectedInventories || formData.selectedInventories.length === 0) {
+        setError('Please select at least one material before proceeding.');
+        setOpenSnackbar(true);
+        return;
+      }
       await saveOrderLines();
       if (openSnackbar && error.includes('Failed')) return; // Stop if save fails
-      setError('Materials saved.'); // Success message for Step 2 to Step 3
+      setError('Materials saved'); // Success message for Step 2 to Step 3
       setOpenSnackbar(true);
     }
 
@@ -431,7 +436,9 @@ const MultiStepCreateOrder = () => {
       >
         <Alert
           severity={
-            error.includes('Failed') || error.includes('Please fill in all required fields') 
+            error.includes('Failed') || 
+            error.includes('Please fill in all required fields') || 
+            error.includes('Please select at least one material') 
               ? 'error' 
               : 'success'
           }
