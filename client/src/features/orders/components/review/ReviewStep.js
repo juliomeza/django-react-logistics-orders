@@ -94,12 +94,17 @@ const ReviewStep = ({
             <Typography variant="body1">{getOrderClassName(formData.order_class)}</Typography>
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <Typography variant="body2" color="text.secondary">Lookup Code Order</Typography>
+            <Typography variant="body2" color="text.secondary">Order Number</Typography>
             <Typography variant="body1">{formData.lookup_code_order}</Typography>
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <Typography variant="body2" color="text.secondary">Lookup Code Shipment</Typography>
+            <Typography variant="body2" color="text.secondary">Shipment Number</Typography>
             <Typography variant="body1">{formData.lookup_code_shipment}</Typography>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <Typography variant="body2" color="text.secondary">Reference Number</Typography>
+            <Typography variant="body1">{formData.reference_number || 'Not specified'}
+            </Typography>
           </Grid>
         </Grid>
 

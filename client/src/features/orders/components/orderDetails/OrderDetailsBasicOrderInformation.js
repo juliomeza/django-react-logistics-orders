@@ -49,7 +49,7 @@ const OrderDetailsBasicOrderInformation = ({
         <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
             id="lookup_code_order"
-            label="Lookup Code Order"
+            label="Order Number"
             name="lookup_code_order"
             value={formData.lookup_code_order}
             onChange={handleChange}
@@ -62,7 +62,7 @@ const OrderDetailsBasicOrderInformation = ({
         <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
             id="lookup_code_shipment"
-            label="Lookup Code Shipment"
+            label="Shipment Number"
             name="lookup_code_shipment"
             value={formData.lookup_code_shipment}
             onChange={handleChange}
@@ -70,6 +70,16 @@ const OrderDetailsBasicOrderInformation = ({
             required
             error={formErrors.lookup_code_shipment}
             helperText={formErrors.lookup_code_shipment && "This field is required"}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <TextField
+            id="reference_number"
+            label="Reference Number"
+            name="reference_number"
+            value={formData.reference_number}
+            onChange={handleChange}
+            fullWidth
           />
         </Grid>
       </Grid>

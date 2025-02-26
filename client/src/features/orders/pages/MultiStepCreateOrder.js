@@ -16,6 +16,7 @@ const MultiStepCreateOrder = () => {
   const [formData, setFormData] = useState({
     lookup_code_order: '',
     lookup_code_shipment: '',
+    reference_number: '',
     notes: '',
     order_type: '',
     order_class: '',
@@ -193,6 +194,7 @@ const MultiStepCreateOrder = () => {
       const orderData = {
         lookup_code_order: formData.lookup_code_order,
         lookup_code_shipment: formData.lookup_code_shipment,
+        reference_number: formData.reference_number || null,
         order_type: formData.order_type,
         order_class: formData.order_class,
         project: formData.project,
