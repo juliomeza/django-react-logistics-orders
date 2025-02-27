@@ -2,15 +2,15 @@ import React, { useState, useContext, useReducer } from 'react';
 import { Container, Typography, Button, Box, Snackbar, Alert } from '@mui/material';
 import { useNavigate, Navigate } from 'react-router-dom';
 import AuthContext from '../../auth/AuthContext';
-import OrderDetailsStep from '../components/orderDetails/OrderDetailsStep';
-import MaterialSelectionStep from '../components/materialSelection/MaterialSelectionStep';
-import ReviewStep from '../components/review/ReviewStep';
-import apiProtected from '../../../services/api/secureApi'; // Added missing import
+import OrderDetailsStep from '../components/OrderDetailsStep';
+import MaterialSelectionStep from '../components/MaterialSelectionStep';
+import ReviewStep from '../components/ReviewStep';
+import apiProtected from '../../../services/api/secureApi';
 import StepperHeader from '../components/StepperHeader';
-import { formReducer, initialFormState } from './formReducer';
-import useReferenceData from './useReferenceData';
-import useInventoriesAndMaterials from './useInventoriesAndMaterials';
-import { saveOrderLines, getFirstOrderStatus, getSubmittedOrderStatus, handleApiError } from './apiUtils';
+import { formReducer, initialFormState } from '../reducers/formReducer';
+import useReferenceData from '../hooks/useReferenceData';
+import useInventoriesAndMaterials from '../hooks/useInventoriesAndMaterials';
+import { saveOrderLines, getFirstOrderStatus, getSubmittedOrderStatus, handleApiError } from '../utils/apiUtils';
 
 const MultiStepCreateOrder = () => {
   const { user, loading: authLoading } = useContext(AuthContext);

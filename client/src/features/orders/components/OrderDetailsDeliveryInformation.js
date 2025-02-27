@@ -1,7 +1,7 @@
 import React from 'react';
 import { Paper, Typography, TextField } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import SelectField from '../SelectField';
+import SelectField from './SelectField';
 
 const OrderDetailsDeliveryInformation = ({
   formData,
