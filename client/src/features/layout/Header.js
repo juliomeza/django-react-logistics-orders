@@ -28,13 +28,15 @@ const Header = () => {
   const fullName = user ? `${user.first_name} ${user.last_name}` : 'Guest User';
   const clientName = !loading && user ? (user.client_name ? user.client_name : 'Company not defined') : '';
 
-  // Actualizamos currentTab para incluir /edit-order/* en "Create Order"
-  const currentTab =
-    location.pathname === '/dashboard'
-      ? 0
-      : location.pathname.startsWith('/create-order') || location.pathname.startsWith('/edit-order')
-      ? 1
-      : 0;
+  // Determinar la pestaña activa
+  const getCurrentTab = () => {
+    if (location.pathname === '/dashboard') return 0;
+    if (location.pathname.startsWith('/create-order') || location.pathname.startsWith('/edit-order')) return 1;
+    if (location.pathname.startsWith('/order/')) return false; // No seleccionamos ninguna pestaña para rutas de vista
+    return 0; // Por defecto, Dashboard
+  };
+
+  const currentTab = getCurrentTab();
 
   const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
