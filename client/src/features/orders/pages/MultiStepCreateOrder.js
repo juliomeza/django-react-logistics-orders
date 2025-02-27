@@ -21,26 +21,42 @@ const MultiStepCreateOrder = () => {
   const referenceData = useReferenceData(user);
   const inventoriesAndMaterials = useInventoriesAndMaterials(user, formData.warehouse);
 
-  const [orderId, setOrderId] = useState(null); // Agregamos el estado orderId aquí
+  const [orderId, setOrderId] = useState(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [error, setError] = useState('');
   const [formErrors, setFormErrors] = useState({});
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const steps = ['Order Details', 'Materials', 'Review'];
 
-  // Cargar datos de la orden si existe un orderId desde los params
   useEffect(() => {
     const fetchOrder = async () => {
       if (orderIdFromParams && user) {
         try {
-          const response = await apiProtected.get(`orders/${orderIdFromParams}/`);
-          const order = response.data;
-          dispatch({ type: 'SET_FORM_DATA', data: order });
-          setOrderId(orderIdFromParams); // Sincronizamos orderId con el de la URL
-          setCurrentStep(0); // Iniciar en el primer paso
+          const orderResponse = await apiProtected.get(`orders/${orderIdFromParams}/`);
+          const order = orderResponse.data;
+          console.log('Loaded order data:', order);
+
+          const linesResponse = await apiProtected.get(`order-lines/order/${orderIdFromParams}/`);
+          console.log('Loaded order lines:', linesResponse.data);
+
+          dispatch({ 
+            type: 'SET_FORM_DATA', 
+            data: { 
+              ...order, 
+              selectedInventories: linesResponse.data.map(line => ({
+                id: line.id,
+                material: line.material,
+                license_plate: line.license_plate,
+                orderQuantity: line.quantity,
+              }))
+            }
+          });
+          setOrderId(orderIdFromParams);
+          setCurrentStep(0);
         } catch (err) {
-          setError('Failed to load order details.');
+          setError('Failed to load order details or lines.');
           setOpenSnackbar(true);
+          console.error('Error:', err);
         }
       }
     };
@@ -92,7 +108,7 @@ const MultiStepCreateOrder = () => {
         response = await apiProtected.patch(`orders/${orderIdFromParams}/`, orderData);
       } else {
         response = await apiProtected.post('orders/', orderData);
-        setOrderId(response.data.id); // Aquí usamos setOrderId correctamente
+        setOrderId(response.data.id);
         dispatch({
           type: 'UPDATE_FIELD',
           field: 'lookup_code_order',
