@@ -29,7 +29,7 @@ const MultiStepCreateOrder = () => {
   const steps = ['Order Details', 'Materials', 'Review'];
 
   // Determina si la orden está bloqueada (creada o en edición)
-  const isOrderLocked = orderId || orderIdFromParams;
+  const isOrderLocked = !!(orderId || orderIdFromParams);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -38,14 +38,27 @@ const MultiStepCreateOrder = () => {
           const orderResponse = await apiProtected.get(`orders/${orderIdFromParams}/`);
           const order = orderResponse.data;
           console.log('Loaded order data:', order);
-
+  
           const linesResponse = await apiProtected.get(`order-lines/order/${orderIdFromParams}/`);
           console.log('Loaded order lines:', linesResponse.data);
-
+  
           dispatch({ 
             type: 'SET_FORM_DATA', 
             data: { 
-              ...order, 
+              ...order,
+              reference_number: order.reference_number ?? '',
+              notes: order.notes ?? '',
+              order_type: order.order_type ?? '',
+              order_class: order.order_class ?? '',
+              warehouse: order.warehouse ?? '',
+              project: order.project ?? '',
+              carrier: order.carrier ?? '',
+              service_type: order.service_type ?? '',
+              contact: order.contact ?? '',
+              expected_delivery_date: order.expected_delivery_date ?? '',
+              shipping_address: order.shipping_address ?? '',
+              billing_address: order.billing_address ?? '',
+              lookup_code_order: order.lookup_code_order ?? '',
               selectedInventories: linesResponse.data.map(line => ({
                 id: line.id,
                 material: line.material,
