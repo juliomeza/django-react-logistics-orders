@@ -20,20 +20,19 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import AuthContext from '../../features/auth/AuthContext';
 
 const Header = () => {
-  // Include loading to control rendering
   const { user, logout, loading } = useContext(AuthContext);
   const location = useLocation();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
 
   const fullName = user ? `${user.first_name} ${user.last_name}` : 'Guest User';
-  // While loading is true, display an empty string
   const clientName = !loading && user ? (user.client_name ? user.client_name : 'Company not defined') : '';
 
+  // Actualizamos currentTab para incluir /edit-order/* en "Create Order"
   const currentTab =
     location.pathname === '/dashboard'
       ? 0
-      : location.pathname === '/create-order'
+      : location.pathname.startsWith('/create-order') || location.pathname.startsWith('/edit-order')
       ? 1
       : 0;
 
@@ -60,7 +59,6 @@ const Header = () => {
     <AppBar position="fixed" color="default" elevation={1}>
       <Container maxWidth="lg">
         <Toolbar>
-          {/* Display customer name only after it's loaded */}
           <Typography variant="h6" sx={{ mr: 4 }}>
             {clientName}
           </Typography>
