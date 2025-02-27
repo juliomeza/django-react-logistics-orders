@@ -12,8 +12,17 @@ import {
   Paper,
   Button,
   Box,
+  IconButton,
+  Snackbar,
+  Alert,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from '@mui/material';
 import { Navigate, useNavigate } from 'react-router-dom';
+import DeleteIcon from '@mui/icons-material/Delete';
 import AuthContext from '../../auth/AuthContext';
 import apiProtected from '../../../services/api/secureApi';
 import SelectField from '../components/SelectField';
@@ -29,6 +38,11 @@ const Dashboard = () => {
   const [selectedType, setSelectedType] = useState('all');
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [ordersError, setOrdersError] = useState('');
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,11 +74,41 @@ const Dashboard = () => {
   });
 
   const handleEditClick = (orderId) => {
-    navigate(`/edit-order/${orderId}`); // Redirige a una ruta de edición
+    navigate(`/edit-order/${orderId}`);
   };
 
   const handleViewClick = (orderId) => {
-    navigate(`/order/${orderId}`); // Redirige a la vista de detalle
+    navigate(`/order/${orderId}`);
+  };
+
+  const handleDeleteClick = (orderId) => {
+    setOrderToDelete(orderId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!orderToDelete) return;
+
+    try {
+      await apiProtected.delete(`/order-lines/order/${orderToDelete}/clear/`);
+      await apiProtected.delete(`/orders/${orderToDelete}/`);
+      setOrders((prevOrders) => prevOrders.filter((order) => order.id !== orderToDelete));
+      setSnackbarMessage('Order deleted successfully.');
+      setSnackbarSeverity('success');
+    } catch (err) {
+      setSnackbarMessage('Failed to delete order. Please try again.');
+      setSnackbarSeverity('error');
+      console.error('Delete error:', err);
+    } finally {
+      setDeleteDialogOpen(false);
+      setOrderToDelete(null);
+      setSnackbarOpen(true);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setOrderToDelete(null);
   };
 
   const formatDate = (dateString) => {
@@ -154,23 +198,35 @@ const Dashboard = () => {
                     <TableCell>{typeName}</TableCell>
                     <TableCell>{formatDate(order.expected_delivery_date)}</TableCell>
                     <TableCell>
-                      {canEdit ? (
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          onClick={(e) => { e.stopPropagation(); handleEditClick(order.id); }}
-                        >
-                          Edit
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          onClick={(e) => { e.stopPropagation(); handleViewClick(order.id); }}
-                        >
-                          View
-                        </Button>
-                      )}
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        {canEdit ? (
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={(e) => { e.stopPropagation(); handleEditClick(order.id); }}
+                          >
+                            Edit
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={(e) => { e.stopPropagation(); handleViewClick(order.id); }}
+                          >
+                            View
+                          </Button>
+                        )}
+                        {canEdit && (
+                          <IconButton
+                            aria-label="delete"
+                            size="small"
+                            onClick={(e) => { e.stopPropagation(); handleDeleteClick(order.id); }}
+                            sx={{ color: 'error.main' }}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        )}
+                      </Box>
                     </TableCell>
                   </TableRow>
                 );
@@ -179,6 +235,46 @@ const Dashboard = () => {
           </Table>
         </TableContainer>
       )}
+
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteCancel}
+        aria-labelledby="delete-dialog-title"
+        aria-describedby="delete-dialog-description"
+      >
+        <DialogTitle id="delete-dialog-title">Delete Order</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="delete-dialog-description">
+            Are you sure you want to delete this order? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDeleteCancel} color="primary">
+            No
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="error" autoFocus>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarSeverity}
+          sx={{ width: '100%' }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
