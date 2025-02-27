@@ -19,6 +19,22 @@ const OrderDetailsLogisticsInformation = ({
         Logistics Information
       </Typography>
       <Grid container spacing={2}>
+      <Grid size={{ xs: 12, sm: 6 }}>
+          <SelectField
+            id="project"
+            label="Project"
+            name="project"
+            value={formData.project || ''}
+            onChange={handleChange}
+            required
+            options={projects || []}
+            getOptionLabel={(option) => option.name}
+            getOptionValue={(option) => option.id}
+            error={formErrors.project}
+            helperText={formErrors.project && "This field is required"}
+            disabled={isOrderLocked} // Opcional: bloqueamos también si querés
+          />
+        </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
           <SelectField
             id="warehouse"
@@ -33,22 +49,6 @@ const OrderDetailsLogisticsInformation = ({
             error={formErrors.warehouse}
             helperText={formErrors.warehouse && "This field is required"}
             disabled={isOrderLocked} // Bloqueamos el campo si la orden existe
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6 }}>
-          <SelectField
-            id="project"
-            label="Project"
-            name="project"
-            value={formData.project || ''}
-            onChange={handleChange}
-            required
-            options={projects || []}
-            getOptionLabel={(option) => option.name}
-            getOptionValue={(option) => option.id}
-            error={formErrors.project}
-            helperText={formErrors.project && "This field is required"}
-            disabled={isOrderLocked} // Opcional: bloqueamos también si querés
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
