@@ -10,7 +10,8 @@ const OrderDetailsLogisticsInformation = ({
   projects = [],
   carriers = [],
   carrierServices = [],
-  formErrors = {} // Añadimos formErrors como prop
+  formErrors = {},
+  isOrderLocked = false, // Nueva prop, por defecto false
 }) => {
   return (
     <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
@@ -23,7 +24,7 @@ const OrderDetailsLogisticsInformation = ({
             id="warehouse"
             label="Warehouse"
             name="warehouse"
-            value={formData.warehouse}
+            value={formData.warehouse || ''} // Aseguramos un valor por defecto
             onChange={handleChange}
             required
             options={warehouses || []}
@@ -31,6 +32,7 @@ const OrderDetailsLogisticsInformation = ({
             getOptionValue={(option) => option.id}
             error={formErrors.warehouse}
             helperText={formErrors.warehouse && "This field is required"}
+            disabled={isOrderLocked} // Bloqueamos el campo si la orden existe
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
@@ -38,7 +40,7 @@ const OrderDetailsLogisticsInformation = ({
             id="project"
             label="Project"
             name="project"
-            value={formData.project}
+            value={formData.project || ''}
             onChange={handleChange}
             required
             options={projects || []}
@@ -46,6 +48,7 @@ const OrderDetailsLogisticsInformation = ({
             getOptionValue={(option) => option.id}
             error={formErrors.project}
             helperText={formErrors.project && "This field is required"}
+            disabled={isOrderLocked} // Opcional: bloqueamos también si querés
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
@@ -53,11 +56,12 @@ const OrderDetailsLogisticsInformation = ({
             id="carrier"
             label="Carrier"
             name="carrier"
-            value={formData.carrier}
+            value={formData.carrier || ''}
             onChange={handleChange}
             options={carriers || []}
             getOptionLabel={(option) => option.name}
             getOptionValue={(option) => option.id}
+            disabled={false} // Editable incluso cuando está bloqueado
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
@@ -65,11 +69,12 @@ const OrderDetailsLogisticsInformation = ({
             id="service_type"
             label="Service Type"
             name="service_type"
-            value={formData.service_type}
+            value={formData.service_type || ''}
             onChange={handleChange}
             options={carrierServices || []}
             getOptionLabel={(option) => option.name}
             getOptionValue={(option) => option.id}
+            disabled={false} // Editable incluso cuando está bloqueado
           />
         </Grid>
       </Grid>

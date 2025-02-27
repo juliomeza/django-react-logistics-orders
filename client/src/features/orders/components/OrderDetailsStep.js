@@ -15,7 +15,8 @@ const OrderDetailsStep = ({
   carrierServices,
   contacts,
   addresses,
-  formErrors // Añadimos formErrors como prop
+  formErrors,
+  isOrderLocked, // Nueva prop
 }) => {
   return (
     <>
@@ -24,7 +25,8 @@ const OrderDetailsStep = ({
         handleChange={handleChange}
         orderTypes={orderTypes}
         orderClasses={orderClasses}
-        formErrors={formErrors} // Pasamos formErrors
+        formErrors={formErrors}
+        isOrderLocked={isOrderLocked} // Pasamos a subcomponentes
       />
       <OrderDetailsLogisticsInformation
         formData={formData}
@@ -33,19 +35,22 @@ const OrderDetailsStep = ({
         projects={projects}
         carriers={carriers}
         carrierServices={carrierServices}
-        formErrors={formErrors} // Pasamos formErrors
+        formErrors={formErrors}
+        isOrderLocked={isOrderLocked} // Pasamos a subcomponentes
       />
       <OrderDetailsDeliveryInformation
         formData={formData}
         handleChange={handleChange}
         contacts={contacts}
         addresses={addresses}
-        formErrors={formErrors} // Pasamos formErrors
+        formErrors={formErrors}
+        isOrderLocked={isOrderLocked} // Pasamos a subcomponentes
       />
       <OrderDetailsAdditionalInformation
         formData={formData}
         handleChange={handleChange}
-        formErrors={formErrors} // Pasamos formErrors (aunque no sea obligatorio aquí)
+        formErrors={formErrors}
+        isOrderLocked={isOrderLocked} // Pasamos a subcomponentes
       />
     </>
   );

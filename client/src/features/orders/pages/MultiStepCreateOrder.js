@@ -28,6 +28,9 @@ const MultiStepCreateOrder = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const steps = ['Order Details', 'Materials', 'Review'];
 
+  // Determina si la orden está bloqueada (creada o en edición)
+  const isOrderLocked = orderId || orderIdFromParams;
+
   useEffect(() => {
     const fetchOrder = async () => {
       if (orderIdFromParams && user) {
@@ -78,14 +81,14 @@ const MultiStepCreateOrder = () => {
     if (!formData.contact) newErrors.contact = true;
     if (!formData.shipping_address) newErrors.shipping_address = true;
     if (!formData.billing_address) newErrors.billing_address = true;
-  
+
     if (Object.keys(newErrors).length > 0) {
       setError('Please fill in all required fields before proceeding.');
       setFormErrors(newErrors);
       setOpenSnackbar(true);
       return;
     }
-  
+
     try {
       const orderData = {
         reference_number: formData.reference_number || null,
@@ -102,12 +105,12 @@ const MultiStepCreateOrder = () => {
         notes: formData.notes || '',
         order_status: formData.order_status || (await getFirstOrderStatus()),
       };
-  
+
       let response;
-      const effectiveOrderId = orderId || orderIdFromParams; // Prioriza orderId del estado
+      const effectiveOrderId = orderId || orderIdFromParams;
       if (effectiveOrderId) {
         response = await apiProtected.patch(`orders/${effectiveOrderId}/`, orderData);
-        console.log('Order updated:', response.data); // Depuración
+        console.log('Order updated:', response.data);
       } else {
         response = await apiProtected.post('orders/', orderData);
         setOrderId(response.data.id);
@@ -116,7 +119,7 @@ const MultiStepCreateOrder = () => {
           field: 'lookup_code_order',
           value: response.data.lookup_code_order,
         });
-        console.log('Order created:', response.data); // Depuración
+        console.log('Order created:', response.data);
       }
       setError(effectiveOrderId ? 'Order updated successfully' : 'Order created successfully');
       setOpenSnackbar(true);
@@ -202,6 +205,7 @@ const MultiStepCreateOrder = () => {
             contacts={referenceData.data.contacts}
             addresses={referenceData.data.addresses}
             formErrors={formErrors}
+            isOrderLocked={isOrderLocked} // Pasamos la prop
           />
         );
       case 1:
