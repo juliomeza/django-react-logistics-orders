@@ -28,16 +28,26 @@ const MaterialSelectionStep = ({
   const [filteredInventories, setFilteredInventories] = useState([]);
   const [selectedItems, setSelectedItems] = useState(formData.selectedInventories || []);
 
-  // Sync selectedItems with formData.selectedInventories
+  // Initialize or update the form data with the selected items
   useEffect(() => {
-    setSelectedItems(formData.selectedInventories || []);
-  }, [formData.selectedInventories]);
+    if (!formData.selectedInventories) {
+      setFormData(prev => ({ ...prev, selectedInventories: [] }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Update the form data when selected items change
+  useEffect(() => {
+    setFormData(prev => ({ ...prev, selectedInventories: selectedItems }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedItems]);
 
   // Filter inventories based on search term
   useEffect(() => {
     if (!inventories) return;
     
     const filtered = inventories.filter(item => {
+      // Find material name for this inventory item
       const material = materials.find(m => m.id === item.material);
       const materialName = material ? material.name : '';
       
@@ -57,18 +67,20 @@ const MaterialSelectionStep = ({
       selectedItem => selectedItem.id === item.id
     );
 
-    let newSelectedItems;
     if (existingItemIndex >= 0) {
-      newSelectedItems = selectedItems.filter((_, index) => index !== existingItemIndex);
+      // If item exists, remove it
+      const newSelectedItems = [...selectedItems];
+      newSelectedItems.splice(existingItemIndex, 1);
+      setSelectedItems(newSelectedItems);
     } else {
-      newSelectedItems = [...selectedItems, { ...item, orderQuantity: 1 }];
+      // If item doesn't exist, add it with default quantity
+      setSelectedItems([...selectedItems, { ...item, orderQuantity: 1 }]);
     }
-    setSelectedItems(newSelectedItems);
-    setFormData(newSelectedItems); // Pass array directly to dispatch
   };
 
   // Handle quantity change for selected items
   const handleQuantityChange = (itemId, newQuantity) => {
+    // Ensure quantity is within valid range (1 to available quantity)
     const item = inventories.find(inv => inv.id === itemId);
     const maxQuantity = parseFloat(item.quantity);
     const quantity = Math.min(Math.max(1, newQuantity), maxQuantity);
@@ -80,7 +92,6 @@ const MaterialSelectionStep = ({
     );
     
     setSelectedItems(newSelectedItems);
-    setFormData(newSelectedItems); // Pass array directly to dispatch
   };
 
   // Check if an item is selected
