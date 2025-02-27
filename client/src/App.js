@@ -3,6 +3,7 @@ import { AuthProvider } from './features/auth/AuthContext';
 import Login from './features/auth/Login';
 import Dashboard from './features/orders/pages/Dashboard';
 import MultiStepCreateOrder from './features/orders/pages/MultiStepCreateOrder';
+import OrderView from './features/orders/pages/OrderView'; // Nueva página
 import MainLayout from './features/layout/MainLayout';
 
 const App = () => {
@@ -25,6 +26,22 @@ const App = () => {
             element={
               <MainLayout>
                 <MultiStepCreateOrder />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/edit-order/:orderId"
+            element={
+              <MainLayout>
+                <MultiStepCreateOrder />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/order/:orderId"
+            element={
+              <MainLayout>
+                <OrderView />
               </MainLayout>
             }
           />

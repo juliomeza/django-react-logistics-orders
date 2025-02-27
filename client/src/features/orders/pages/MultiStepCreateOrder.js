@@ -1,6 +1,6 @@
-import React, { useState, useContext, useReducer } from 'react';
+import React, { useState, useContext, useReducer, useEffect } from 'react';
 import { Container, Typography, Button, Box, Snackbar, Alert } from '@mui/material';
-import { useNavigate, Navigate } from 'react-router-dom';
+import { useNavigate, Navigate, useParams } from 'react-router-dom';
 import AuthContext from '../../auth/AuthContext';
 import OrderDetailsStep from '../components/OrderDetailsStep';
 import MaterialSelectionStep from '../components/MaterialSelectionStep';
@@ -15,17 +15,37 @@ import { saveOrderLines, getFirstOrderStatus, getSubmittedOrderStatus, handleApi
 const MultiStepCreateOrder = () => {
   const { user, loading: authLoading } = useContext(AuthContext);
   const navigate = useNavigate();
+  const { orderId: orderIdFromParams } = useParams();
 
   const [formData, dispatch] = useReducer(formReducer, initialFormState);
   const referenceData = useReferenceData(user);
   const inventoriesAndMaterials = useInventoriesAndMaterials(user, formData.warehouse);
 
-  const [orderId, setOrderId] = useState(null);
+  const [orderId, setOrderId] = useState(null); // Agregamos el estado orderId aquí
   const [currentStep, setCurrentStep] = useState(0);
   const [error, setError] = useState('');
   const [formErrors, setFormErrors] = useState({});
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const steps = ['Order Details', 'Materials', 'Review'];
+
+  // Cargar datos de la orden si existe un orderId desde los params
+  useEffect(() => {
+    const fetchOrder = async () => {
+      if (orderIdFromParams && user) {
+        try {
+          const response = await apiProtected.get(`orders/${orderIdFromParams}/`);
+          const order = response.data;
+          dispatch({ type: 'SET_FORM_DATA', data: order });
+          setOrderId(orderIdFromParams); // Sincronizamos orderId con el de la URL
+          setCurrentStep(0); // Iniciar en el primer paso
+        } catch (err) {
+          setError('Failed to load order details.');
+          setOpenSnackbar(true);
+        }
+      }
+    };
+    fetchOrder();
+  }, [orderIdFromParams, user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,7 +71,6 @@ const MultiStepCreateOrder = () => {
     }
 
     try {
-      const orderStatusId = await getFirstOrderStatus();
       const orderData = {
         reference_number: formData.reference_number || null,
         order_type: formData.order_type,
@@ -65,30 +84,33 @@ const MultiStepCreateOrder = () => {
         service_type: formData.service_type || null,
         expected_delivery_date: formData.expected_delivery_date || null,
         notes: formData.notes || '',
-        order_status: orderStatusId,
+        order_status: formData.order_status || (await getFirstOrderStatus()),
       };
 
-      console.log('Sending order data:', orderData); // Debug
-      const orderResponse = await apiProtected.post('orders/', orderData);
-      setOrderId(orderResponse.data.id);
-      dispatch({
-        type: 'UPDATE_FIELD',
-        field: 'lookup_code_order',
-        value: orderResponse.data.lookup_code_order,
-      });
-      setError('Order created successfully');
+      let response;
+      if (orderIdFromParams) {
+        response = await apiProtected.patch(`orders/${orderIdFromParams}/`, orderData);
+      } else {
+        response = await apiProtected.post('orders/', orderData);
+        setOrderId(response.data.id); // Aquí usamos setOrderId correctamente
+        dispatch({
+          type: 'UPDATE_FIELD',
+          field: 'lookup_code_order',
+          value: response.data.lookup_code_order,
+        });
+      }
+      setError(orderIdFromParams ? 'Order updated successfully' : 'Order created successfully');
       setOpenSnackbar(true);
       setCurrentStep((prev) => prev + 1);
     } catch (error) {
-      console.error('Error creating order:', error); // Debug
-      const errorMessage = handleApiError(error, 'Failed to create order. Please try again.');
+      const errorMessage = handleApiError(error, 'Failed to save order. Please try again.');
       setError(errorMessage);
       setOpenSnackbar(true);
     }
   };
 
   const handleMaterialsNext = async () => {
-    const success = await saveOrderLines(formData, orderId, setError, setOpenSnackbar);
+    const success = await saveOrderLines(formData, orderId || formData.id, setError, setOpenSnackbar);
     if (success) {
       setCurrentStep((prev) => prev + 1);
     }
@@ -110,7 +132,7 @@ const MultiStepCreateOrder = () => {
 
   const handleSave = async () => {
     if (currentStep === 1) {
-      await saveOrderLines(formData, orderId, setError, setOpenSnackbar);
+      await saveOrderLines(formData, orderId || formData.id, setError, setOpenSnackbar);
     }
   };
 
@@ -119,15 +141,14 @@ const MultiStepCreateOrder = () => {
     if (currentStep !== steps.length - 1) return;
 
     try {
-      const success = await saveOrderLines(formData, orderId, setError, setOpenSnackbar);
+      const success = await saveOrderLines(formData, orderId || formData.id, setError, setOpenSnackbar);
       if (!success) throw new Error('Failed to save lines');
       const submittedStatusId = await getSubmittedOrderStatus();
-      await apiProtected.patch(`orders/${orderId}/`, { order_status: submittedStatusId });
+      await apiProtected.patch(`orders/${orderId || formData.id}/`, { order_status: submittedStatusId });
       setError('Order submitted successfully.');
       setOpenSnackbar(true);
       setTimeout(() => navigate('/dashboard'), 2000);
     } catch (error) {
-      console.error('Error submitting order:', error); // Debug
       const errorMessage = handleApiError(error, 'Failed to submit order. Please try again.');
       setError(errorMessage);
       setOpenSnackbar(true);

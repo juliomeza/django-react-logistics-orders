@@ -22,16 +22,14 @@ const Dashboard = () => {
   const { user, loading } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // State for orders and filters
   const [orders, setOrders] = useState([]);
   const [orderStatuses, setOrderStatuses] = useState([]);
   const [orderTypes, setOrderTypes] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState('all');
-  const [selectedType, setSelectedType] = useState('all'); // New state for type filter
+  const [selectedType, setSelectedType] = useState('all');
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [ordersError, setOrdersError] = useState('');
 
-  // Fetch orders, statuses, and types
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -55,27 +53,30 @@ const Dashboard = () => {
     }
   }, [user]);
 
-  // Filter orders based on selected status and type
   const filteredOrders = orders.filter(order => {
     const statusMatch = selectedStatus === 'all' || order.order_status === parseInt(selectedStatus, 10);
     const typeMatch = selectedType === 'all' || order.order_type === parseInt(selectedType, 10);
     return statusMatch && typeMatch;
   });
 
-  // Handle click on an order
-  const handleOrderClick = (orderId) => {
-    navigate(`/order/${orderId}`);
+  const handleEditClick = (orderId) => {
+    navigate(`/edit-order/${orderId}`); // Redirige a una ruta de edición
   };
 
-  // Format date to MM-DD-YYYY
+  const handleViewClick = (orderId) => {
+    navigate(`/order/${orderId}`); // Redirige a la vista de detalle
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
     return `${month}-${day}-${year}`;
   };
+
+  const isCreatedStatus = (statusId) => statusId === 1;
 
   if (loading) {
     return (
@@ -92,7 +93,6 @@ const Dashboard = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      {/* Filters for status and type */}
       <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 3, gap: 2 }}>
         <SelectField
           id="status-filter"
@@ -120,7 +120,6 @@ const Dashboard = () => {
         />
       </Box>
 
-      {/* Orders table */}
       {ordersLoading ? (
         <Box sx={{ textAlign: 'center' }}>
           <CircularProgress />
@@ -146,16 +145,32 @@ const Dashboard = () => {
               {filteredOrders.map((order) => {
                 const status = orderStatuses.find(s => s.id === order.order_status)?.status_name || 'Unknown';
                 const typeName = orderTypes.find(t => t.id === order.order_type)?.type_name || 'Unknown';
+                const canEdit = isCreatedStatus(order.order_status);
+
                 return (
-                  <TableRow key={order.id} hover onClick={() => handleOrderClick(order.id)} sx={{ cursor: 'pointer' }}>
+                  <TableRow key={order.id} hover sx={{ cursor: 'pointer' }}>
                     <TableCell>{order.lookup_code_order}</TableCell>
                     <TableCell>{status}</TableCell>
                     <TableCell>{typeName}</TableCell>
                     <TableCell>{formatDate(order.expected_delivery_date)}</TableCell>
                     <TableCell>
-                      <Button variant="outlined" size="small" onClick={(e) => { e.stopPropagation(); handleOrderClick(order.id); }}>
-                        View Details
-                      </Button>
+                      {canEdit ? (
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={(e) => { e.stopPropagation(); handleEditClick(order.id); }}
+                        >
+                          Edit
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={(e) => { e.stopPropagation(); handleViewClick(order.id); }}
+                        >
+                          View
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 );

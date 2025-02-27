@@ -44,3 +44,14 @@ class OrderLineViewSet(viewsets.ModelViewSet):
             return Response({'detail': 'Order ID is required.'}, status=400)
         OrderLine.objects.filter(order_id=order_id).delete()
         return Response({'detail': 'All order lines deleted successfully.'})
+    
+    # Nueva acción personalizada para listar líneas por order_id
+    @action(detail=False, methods=['get'], url_path='order/(?P<order_id>[^/.]+)')
+    def list_order_lines(self, request, order_id=None):
+        """List all order lines for the specified order."""
+        if not order_id:
+            return Response({'detail': 'Order ID is required.'}, status=400)
+        lines = OrderLine.objects.filter(order_id=order_id)
+        serializer = self.get_serializer(lines, many=True)
+        return Response(serializer.data)
+
