@@ -16,26 +16,6 @@ const OrderDetailsBasicOrderInformation = ({
         Basic Order Information
       </Typography>
       <Grid container spacing={2}>
-      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <TextField
-            id="lookup_code_order"
-            label="Order Number"
-            name="lookup_code_order"
-            value={formData.lookup_code_order || 'Will be generated on Next'}
-            disabled
-            fullWidth
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <TextField
-            id="reference_number"
-            label="Reference Number"
-            name="reference_number"
-            value={formData.reference_number}
-            onChange={handleChange}
-            fullWidth
-          />
-        </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <SelectField
             id="order_type"
@@ -64,6 +44,26 @@ const OrderDetailsBasicOrderInformation = ({
             getOptionValue={(option) => option.id}
             error={formErrors.order_class}
             helperText={formErrors.order_class && "This field is required"}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <TextField
+            id="reference_number"
+            label="Reference Number"
+            name="reference_number"
+            value={formData.reference_number}
+            onChange={handleChange}
+            fullWidth
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <TextField
+            id="lookup_code_order"
+            label="Order Number"
+            name="lookup_code_order"
+            value={formData.lookup_code_order || 'Will be generated on Next'}
+            disabled
+            fullWidth
           />
         </Grid>
       </Grid>
