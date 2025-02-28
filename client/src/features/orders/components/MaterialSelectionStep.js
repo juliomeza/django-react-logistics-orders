@@ -12,7 +12,7 @@ import {
   IconButton,
   Box,
   CircularProgress,
-  Autocomplete,
+  Autocomplete
 } from '@mui/material';
 import { Delete, Add } from '@mui/icons-material';
 
@@ -167,9 +167,7 @@ const MaterialSelectionStep = ({
               <TableHead>
                 <TableRow>
                   <TableCell>Material Code</TableCell>
-                  <TableCell>Material Name</TableCell>
-                  <TableCell>License Plate</TableCell>
-                  <TableCell>Location</TableCell>
+                  <TableCell width="40%">Material Name</TableCell>
                   <TableCell align="right">Available Qty</TableCell>
                   <TableCell>Order Qty</TableCell>
                   <TableCell align="center">Actions</TableCell>
@@ -182,8 +180,6 @@ const MaterialSelectionStep = ({
                     <TableRow key={item.id}>
                       <TableCell>{item.materialCode || material?.lookup_code || '-'}</TableCell>
                       <TableCell>{item.materialName || material?.name || 'Unknown Material'}</TableCell>
-                      <TableCell>{item.license_plate}</TableCell>
-                      <TableCell>{item.location}</TableCell>
                       <TableCell align="right">{
                         // Format the availableQty properly - ensure it's a valid number
                         (typeof item.availableQty === 'number' && !isNaN(item.availableQty)) 
@@ -255,8 +251,6 @@ const MaterialSelectionStep = ({
                   </TableCell>
                   <TableCell></TableCell>
                   <TableCell></TableCell>
-                  <TableCell></TableCell>
-                  <TableCell></TableCell>
                   <TableCell align="right">
                     <IconButton 
                       color="primary"
@@ -270,7 +264,7 @@ const MaterialSelectionStep = ({
                 
                 {selectedItems.length === 0 && availableOptions.length > 0 && (
                   <TableRow>
-                    <TableCell colSpan={7} align="center" sx={{ py: 2 }}>
+                    <TableCell colSpan={5} align="center" sx={{ py: 2 }}>
                       <Typography variant="body2" color="text.secondary">
                         Search and select materials to add to your order
                       </Typography>
@@ -280,7 +274,7 @@ const MaterialSelectionStep = ({
                 
                 {availableOptions.length === 0 && selectedItems.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={7} align="center" sx={{ py: 2 }}>
+                    <TableCell colSpan={5} align="center" sx={{ py: 2 }}>
                       <Typography variant="body2" color="text.secondary">
                         No inventory items available
                       </Typography>
