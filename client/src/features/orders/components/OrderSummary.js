@@ -76,7 +76,34 @@ const OrderSummary = ({
 
   const getAddressLine = (id) => {
     const item = referenceData.addresses?.find(item => item.id === id);
-    return item ? item.address_line_1 : 'Unknown';
+    if (!item) return 'Unknown';
+    
+    const parts = [];
+    
+    // Add address lines
+    if (item.address_line_1) parts.push(item.address_line_1);
+    if (item.address_line_2) parts.push(item.address_line_2);
+    
+    // Add city, state and postal code
+    const cityStateZip = [];
+    if (item.city) cityStateZip.push(item.city);
+    if (item.state) cityStateZip.push(item.state);
+    if (item.postal_code) cityStateZip.push(item.postal_code);
+    
+    if (cityStateZip.length > 0) {
+      parts.push(cityStateZip.join(', '));
+    }
+    
+    // Add country
+    if (item.country) parts.push(item.country);
+    
+    // Join all parts with line breaks
+    return parts.map((part, index) => (
+      <React.Fragment key={index}>
+        {part}
+        {index < parts.length - 1 && <br />}
+      </React.Fragment>
+    ));
   };
 
   const getMaterialName = (id) => {
