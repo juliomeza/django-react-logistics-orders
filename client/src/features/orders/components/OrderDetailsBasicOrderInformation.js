@@ -16,7 +16,7 @@ const OrderDetailsBasicOrderInformation = ({
         Basic Order Information
       </Typography>
       <Grid container spacing={2}>
-      <Grid size={{ xs: 12, sm: 6 }}>
+      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <TextField
             id="lookup_code_order"
             label="Order Number"
@@ -26,7 +26,7 @@ const OrderDetailsBasicOrderInformation = ({
             fullWidth
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <TextField
             id="reference_number"
             label="Reference Number"
@@ -36,7 +36,7 @@ const OrderDetailsBasicOrderInformation = ({
             fullWidth
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <SelectField
             id="order_type"
             label="Order Type"
@@ -51,7 +51,7 @@ const OrderDetailsBasicOrderInformation = ({
             helperText={formErrors.order_type && "This field is required"}
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <SelectField
             id="order_class"
             label="Order Class"

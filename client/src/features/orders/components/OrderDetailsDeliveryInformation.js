@@ -8,7 +8,7 @@ const OrderDetailsDeliveryInformation = ({
   handleChange,
   contacts = [],
   addresses = [],
-  formErrors = {} // Añadimos formErrors como prop
+  formErrors = {}
 }) => {
   return (
     <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
@@ -16,7 +16,19 @@ const OrderDetailsDeliveryInformation = ({
         Delivery Information
       </Typography>
       <Grid container spacing={2}>
-        <Grid size={{ xs: 12, sm: 6 }}>
+      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <TextField
+            id="expected_delivery_date"
+            label="Expected Delivery Date"
+            name="expected_delivery_date"
+            type="date"
+            value={formData.expected_delivery_date}
+            onChange={handleChange}
+            slotProps={{ inputLabel: { shrink: true } }}
+            fullWidth
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <SelectField
             id="contact"
             label="Contact"
@@ -31,19 +43,7 @@ const OrderDetailsDeliveryInformation = ({
             helperText={formErrors.contact && "This field is required"}
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6 }}>
-          <TextField
-            id="expected_delivery_date"
-            label="Expected Delivery Date"
-            name="expected_delivery_date"
-            type="date"
-            value={formData.expected_delivery_date}
-            onChange={handleChange}
-            slotProps={{ inputLabel: { shrink: true } }}
-            fullWidth
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <SelectField
             id="shipping_address"
             label="Shipping Address"
@@ -58,7 +58,7 @@ const OrderDetailsDeliveryInformation = ({
             helperText={formErrors.shipping_address && "This field is required"}
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <SelectField
             id="billing_address"
             label="Billing Address"
