@@ -13,6 +13,7 @@ import {
   Box,
   CircularProgress,
   Autocomplete,
+  InputAdornment
 } from '@mui/material';
 import { Delete, Add } from '@mui/icons-material';
 
@@ -24,6 +25,7 @@ const MaterialSelectionStep = ({
   loading = false
 }) => {
   const [selectedItems, setSelectedItems] = useState(formData.selectedInventories || []);
+  const [newRowActive, setNewRowActive] = useState(true);
   const [currentSelection, setCurrentSelection] = useState(null);
   const [inputValue, setInputValue] = useState('');
 
@@ -97,9 +99,9 @@ const MaterialSelectionStep = ({
     };
   });
 
-  // Filter out options that are already selected - by material ID to prevent duplicates
+  // Filter out options that are already selected
   const availableOptions = inventoryOptions.filter(option => 
-    !selectedItems.some(item => item.material === option.material)
+    !selectedItems.some(item => item.id === option.id)
   );
 
   // Handle adding a new item when selected from autocomplete
