@@ -71,7 +71,51 @@ const OrderSummary = ({
 
   const getContactName = (id) => {
     const item = referenceData.contacts?.find(item => item.id === id);
-    return item ? `${item.company_name} - ${item.contact_name}` : 'Unknown';
+    if (!item) return <Typography variant="body1">Unknown</Typography>;
+  
+    const parts = [];
+  
+    // Si hay company_name, lo agregamos
+    if (item.company_name) {
+      parts.push(
+        <Typography key="company" variant="body1" component="span">
+          {item.company_name}
+        </Typography>
+      );
+    }
+  
+    // Si hay contact_name, lo agregamos
+    if (item.contact_name) {
+      if (parts.length > 0) {
+        parts.push(
+          <Typography key="contact" variant="body1" component="span" sx={{ display: 'block' }}>
+            {item.contact_name}
+          </Typography>
+        );
+      } else {
+        parts.push(
+          <Typography key="contact" variant="body1" component="span">
+            {item.contact_name}
+          </Typography>
+        );
+      }
+    }
+  
+    // Si hay attention, lo agregamos opcionalmente
+    if (item.attention) {
+      parts.push(
+        <Typography key="attention" variant="body2" component="span" color="text.secondary" sx={{ display: 'block' }}>
+          Attn: {item.attention}
+        </Typography>
+      );
+    }
+  
+    // Si no hay nada, mostramos "Not specified"
+    if (parts.length === 0) {
+      return <Typography variant="body1" style={{ color: 'rgba(0, 0, 0, 0.6)', fontStyle: 'italic' }}>Not specified</Typography>;
+    }
+  
+    return parts;
   };
 
   const getAddressLine = (id) => {
