@@ -71,7 +71,7 @@ const OrderSummary = ({
 
   const getContactName = (id) => {
     const item = referenceData.contacts?.find(item => item.id === id);
-    return item ? `${item.first_name} ${item.last_name}` : 'Unknown';
+    return item ? `${item.company_name} - ${item.contact_name}` : 'Unknown';
   };
 
   const getAddressLine = (id) => {

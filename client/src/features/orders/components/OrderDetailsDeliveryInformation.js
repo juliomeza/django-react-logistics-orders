@@ -37,7 +37,7 @@ const OrderDetailsDeliveryInformation = ({
             onChange={handleChange}
             required
             options={contacts || []}
-            getOptionLabel={(option) => `${option.first_name} ${option.last_name}`}
+            getOptionLabel={(option) => `${option.company_name} - ${option.contact_name}`}
             getOptionValue={(option) => option.id}
             error={formErrors.contact}
             helperText={formErrors.contact && "This field is required"}
