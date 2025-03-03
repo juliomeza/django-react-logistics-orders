@@ -20,16 +20,12 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Tabs,
-  Tab,
-  TextField,
-  InputAdornment,
 } from '@mui/material';
 import { Navigate, useNavigate } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
-import SearchIcon from '@mui/icons-material/Search';
 import AuthContext from '../../auth/AuthContext';
 import apiProtected from '../../../services/api/secureApi';
+import SelectField from '../components/SelectField';
 
 const Dashboard = () => {
   const { user, loading } = useContext(AuthContext);
@@ -38,8 +34,8 @@ const Dashboard = () => {
   const [orders, setOrders] = useState([]);
   const [orderStatuses, setOrderStatuses] = useState([]);
   const [orderTypes, setOrderTypes] = useState([]);
-  const [searchText, setSearchText] = useState('');
-  const [selectedTab, setSelectedTab] = useState(0); // 0 para Outbound, 1 para Inbound
+  const [selectedStatus, setSelectedStatus] = useState('all');
+  const [selectedType, setSelectedType] = useState('all');
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [ordersError, setOrdersError] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -72,26 +68,9 @@ const Dashboard = () => {
   }, [user]);
 
   const filteredOrders = orders.filter(order => {
-    // Filtramos según el texto de búsqueda (Order Number o Reference Number)
-    const searchMatch = searchText === '' || 
-      (order.lookup_code_order && order.lookup_code_order.toLowerCase().includes(searchText.toLowerCase())) ||
-      (order.reference_number && order.reference_number.toLowerCase().includes(searchText.toLowerCase()));
-    
-    // Filtramos según la pestaña activa (Outbound o Inbound)
-    // Asumimos que los tipos están divididos entre Inbound y Outbound
-    const outboundTypes = orderTypes
-      .filter(type => type.type_name?.toLowerCase().includes('outbound') || type.is_outbound)
-      .map(type => type.id);
-    
-    const inboundTypes = orderTypes
-      .filter(type => type.type_name?.toLowerCase().includes('inbound') || type.is_inbound)
-      .map(type => type.id);
-      
-    const tabMatch = selectedTab === 0
-      ? outboundTypes.includes(order.order_type)
-      : inboundTypes.includes(order.order_type);
-      
-    return searchMatch && tabMatch;
+    const statusMatch = selectedStatus === 'all' || order.order_status === parseInt(selectedStatus, 10);
+    const typeMatch = selectedType === 'all' || order.order_type === parseInt(selectedType, 10);
+    return statusMatch && typeMatch;
   });
 
   const handleEditClick = (orderId) => {
@@ -132,8 +111,13 @@ const Dashboard = () => {
     setOrderToDelete(null);
   };
 
-  const handleTabChange = (event, newValue) => {
-    setSelectedTab(newValue);
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${month}-${day}-${year}`;
   };
 
   const isCreatedStatus = (statusId) => statusId === 1;
@@ -153,28 +137,30 @@ const Dashboard = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-        <Tabs value={selectedTab} onChange={handleTabChange} aria-label="order type tabs">
-          <Tab label="Outbound" />
-          <Tab label="Inbound" />
-        </Tabs>
-      </Box>
-      
       <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 3, gap: 2 }}>
-        <TextField
-          id="search-box"
-          label="Search Order or Reference Number"
-          variant="outlined"
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          sx={{ minWidth: 300 }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
+        <SelectField
+          id="status-filter"
+          label="Status"
+          name="status"
+          value={selectedStatus}
+          onChange={(e) => setSelectedStatus(e.target.value)}
+          options={[{ id: 'all', status_name: 'All' }, ...orderStatuses]}
+          getOptionValue={(option) => option.id}
+          getOptionLabel={(option) => option.status_name || option.name}
+          sx={{ minWidth: 200 }}
+          fullWidth={false}
+        />
+        <SelectField
+          id="type-filter"
+          label="Type"
+          name="type"
+          value={selectedType}
+          onChange={(e) => setSelectedType(e.target.value)}
+          options={[{ id: 'all', type_name: 'All' }, ...orderTypes]}
+          getOptionValue={(option) => option.id}
+          getOptionLabel={(option) => option.type_name}
+          sx={{ minWidth: 200 }}
+          fullWidth={false}
         />
       </Box>
 
@@ -193,21 +179,24 @@ const Dashboard = () => {
             <TableHead>
               <TableRow>
                 <TableCell><Typography variant="subtitle2">Order</Typography></TableCell>
-                <TableCell><Typography variant="subtitle2">Reference Number</Typography></TableCell>
                 <TableCell><Typography variant="subtitle2">Status</Typography></TableCell>
+                <TableCell><Typography variant="subtitle2">Type</Typography></TableCell>
+                <TableCell><Typography variant="subtitle2">Expected Date</Typography></TableCell>
                 <TableCell><Typography variant="subtitle2">Actions</Typography></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {filteredOrders.map((order) => {
                 const status = orderStatuses.find(s => s.id === order.order_status)?.status_name || 'Unknown';
+                const typeName = orderTypes.find(t => t.id === order.order_type)?.type_name || 'Unknown';
                 const canEdit = isCreatedStatus(order.order_status);
 
                 return (
                   <TableRow key={order.id} hover sx={{ cursor: 'pointer' }}>
                     <TableCell>{order.lookup_code_order}</TableCell>
-                    <TableCell>{order.reference_number || '-'}</TableCell>
                     <TableCell>{status}</TableCell>
+                    <TableCell>{typeName}</TableCell>
+                    <TableCell>{formatDate(order.expected_delivery_date)}</TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', gap: 1 }}>
                         {canEdit ? (
