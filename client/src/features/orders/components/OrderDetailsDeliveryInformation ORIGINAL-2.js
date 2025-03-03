@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Paper, Typography, TextField, Autocomplete, Box } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
@@ -7,29 +7,9 @@ const OrderDetailsDeliveryInformation = ({
   handleChange,
   contacts = [],
   addresses = [],
-  formErrors = {}
+  formErrors = {},
+  isOrderLocked = false
 }) => {
-  // Format date value for date input (YYYY-MM-DD)
-  const formatDateForInput = (dateString) => {
-    if (!dateString) return '';
-    
-    // If it's already in YYYY-MM-DD format, return as is
-    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-      return dateString;
-    }
-    
-    // If it's a full ISO string, extract just the date part
-    try {
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) return ''; // Invalid date
-      
-      return date.toISOString().split('T')[0]; // Get YYYY-MM-DD part only
-    } catch (e) {
-      console.error("Error formatting date:", e);
-      return '';
-    }
-  };
-
   // Format contact options to show either Company Name or Contact Name with City from shipping address only
   const contactOptions = contacts.map(contact => {
     // Find only shipping address for this contact to extract city
@@ -48,10 +28,9 @@ const OrderDetailsDeliveryInformation = ({
     };
   });
 
-  // Find the selected contact object by ID
-  const selectedContactId = formData.contact;
-  const selectedContact = selectedContactId 
-    ? contactOptions.find(c => c.id === selectedContactId) || null
+  // Find the selected contact object
+  const selectedContact = formData.contact 
+    ? contactOptions.find(c => c.id === formData.contact) || null
     : null;
 
   // Find the selected shipping and billing addresses
@@ -129,10 +108,11 @@ const OrderDetailsDeliveryInformation = ({
             label="Expected Delivery Date"
             name="expected_delivery_date"
             type="date"
-            value={formatDateForInput(formData.expected_delivery_date)}
+            value={formData.expected_delivery_date || ''}
             onChange={handleChange}
             slotProps={{ inputLabel: { shrink: true } }}
             fullWidth
+            disabled={isOrderLocked}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -151,26 +131,14 @@ const OrderDetailsDeliveryInformation = ({
                 fullWidth
               />
             )}
-            isOptionEqualToValue={(option, value) => {
-              // Strong strict comparison for contact IDs
-              if (!option || !value) return false;
-              return String(option.id) === String(value.id);
-            }}
+            disabled={isOrderLocked}
+            isOptionEqualToValue={(option, value) => option?.id === value?.id}
           />
         </Grid>
 
         {/* Shipping address display */}
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Box sx={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            height: '100%', 
-            border: '1px solid #e0e0e0', 
-            borderRadius: 1, 
-            p: 1,
-            backgroundColor: '#f5f5f5', // Light gray background to indicate locked
-            opacity: 0.9            // Slightly reduce opacity
-          }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', border: '1px solid #e0e0e0', borderRadius: 1, p: 1 }}>
             <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold', mb: 0.5 }}>
               Shipping Address *
             </Typography>
@@ -178,7 +146,7 @@ const OrderDetailsDeliveryInformation = ({
               variant="body2" 
               sx={{ 
                 flexGrow: 1,
-                color: formErrors.shipping_address ? 'error.main' : 'text.secondary', // Darker text color for "locked" appearance
+                color: formErrors.shipping_address ? 'error.main' : 'text.primary'
               }}
             >
               {selectedShippingAddress ? formatAddress(selectedShippingAddress) : "No address selected"}
@@ -193,16 +161,7 @@ const OrderDetailsDeliveryInformation = ({
         
         {/* Billing address display */}
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Box sx={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            height: '100%', 
-            border: '1px solid #e0e0e0', 
-            borderRadius: 1, 
-            p: 1,
-            backgroundColor: '#f5f5f5', // Light gray background to indicate locked
-            opacity: 0.9            // Slightly reduce opacity
-          }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', border: '1px solid #e0e0e0', borderRadius: 1, p: 1 }}>
             <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold', mb: 0.5 }}>
               Billing Address *
             </Typography>
@@ -210,7 +169,7 @@ const OrderDetailsDeliveryInformation = ({
               variant="body2" 
               sx={{ 
                 flexGrow: 1,
-                color: formErrors.billing_address ? 'error.main' : 'text.secondary', // Darker text color for "locked" appearance
+                color: formErrors.billing_address ? 'error.main' : 'text.primary'
               }}
             >
               {selectedBillingAddress ? formatAddress(selectedBillingAddress) : "No address selected"}
