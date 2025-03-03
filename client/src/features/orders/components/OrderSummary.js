@@ -9,6 +9,7 @@ import {
   TableHead,
   TableRow,
   Divider,
+  useTheme,
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
@@ -29,6 +30,7 @@ const OrderSummary = ({
   materialItems = [],
   isReviewMode = false
 }) => {
+  const theme = useTheme();
   
   // Helper function to display empty values
   const displayValue = (value) => {
@@ -158,6 +160,16 @@ const OrderSummary = ({
   // Check if materials are selected
   const hasMaterials = materialItems && materialItems.length > 0;
 
+  // Estilo para el número de orden destacado
+  const orderNumberStyle = {
+    color: theme.palette.primary.main,
+    fontWeight: 600,
+    padding: '3px 8px',
+    borderRadius: '4px',
+    backgroundColor: theme.palette.status.inProgress.backgroundColor,
+    display: 'inline-block',
+  };
+
   return (
     <>
       <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
@@ -179,7 +191,11 @@ const OrderSummary = ({
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Typography variant="body2" color="text.secondary">Order Number</Typography>
-            <Typography variant="body1">{orderData.lookup_code_order}</Typography>
+            <Typography variant="body1">
+              <span style={orderNumberStyle}>
+                {orderData.lookup_code_order}
+              </span>
+            </Typography>
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Typography variant="body2" color="text.secondary">Reference Number</Typography>
