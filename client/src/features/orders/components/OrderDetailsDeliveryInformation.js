@@ -145,7 +145,7 @@ const OrderDetailsDeliveryInformation = ({
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Contact *"
+                label="Company or Contact *"
                 error={!!formErrors.contact}
                 helperText={formErrors.contact && "This field is required"}
                 fullWidth
