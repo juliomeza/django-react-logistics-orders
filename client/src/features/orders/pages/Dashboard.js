@@ -158,6 +158,41 @@ const Dashboard = () => {
     setSelectedTab(newValue);
   };
 
+  // Función para obtener el color del chip según el status ID
+  const getStatusChipColor = (statusId) => {
+    // Agrupación de colores por tipo de estado
+    switch (statusId) {
+      case 1: // Created
+      case 2: // Submitted
+        return {
+          backgroundColor: '#e8e0ff',
+          color: '#5a3dbf',
+          border: '1px solid #d4c6ff'
+        };
+      case 3: // Received
+      case 4: // Processing
+      case 5: // Shipped
+      case 6: // In Transit
+        return {
+          backgroundColor: '#e0f0ff',
+          color: '#1976d2',
+          border: '1px solid #c6e2ff'
+        };
+      case 7: // Delivered
+        return {
+          backgroundColor: '#e6f5e6',
+          color: '#2e7d32',
+          border: '1px solid #c8e6c9'
+        };
+      default:
+        return {
+          backgroundColor: '#f5f5f5',
+          color: '#616161',
+          border: '1px solid #e0e0e0'
+        };
+    }
+  };
+
   const isCreatedStatus = (statusId) => statusId === 1;
 
   if (loading) {
@@ -227,6 +262,8 @@ const Dashboard = () => {
             <TableBody>
               {filteredOrders.map((order) => {
                 const status = orderStatuses.find(s => s.id === order.order_status)?.status_name || 'Unknown';
+                const statusId = order.order_status;
+                const statusStyle = getStatusChipColor(statusId);
                 const canEdit = isCreatedStatus(order.order_status);
                 
                 // Obtener el contacto asociado a esta orden
@@ -253,7 +290,18 @@ const Dashboard = () => {
                     <TableCell>{order.reference_number || '-'}</TableCell>
                     <TableCell>{customerDisplay}</TableCell>
                     <TableCell>{destinationDisplay}</TableCell>
-                    <TableCell>{status}</TableCell>
+                    <TableCell>
+                      <span style={{
+                        display: 'inline-block',
+                        padding: '4px 10px',
+                        borderRadius: '16px',
+                        fontSize: '0.85rem',
+                        fontWeight: '500',
+                        ...statusStyle
+                      }}>
+                        {status}
+                      </span>
+                    </TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', gap: 1 }}>
                         {canEdit ? (
