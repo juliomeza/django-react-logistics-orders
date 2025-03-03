@@ -8,6 +8,29 @@ const theme = createTheme({
     secondary: {
       main: '#dc004e',
     },
+    // Nuevos colores para los status
+    status: {
+      initial: {
+        backgroundColor: '#e8e0ff',
+        color: '#5a3dbf',
+        border: '#d4c6ff'
+      },
+      inProgress: {
+        backgroundColor: '#e0f0ff',
+        color: '#1976d2',
+        border: '#c6e2ff'
+      },
+      completed: {
+        backgroundColor: '#e6f5e6',
+        color: '#2e7d32',
+        border: '#c8e6c9'
+      },
+      default: {
+        backgroundColor: '#f5f5f5',
+        color: '#616161',
+        border: '#e0e0e0'
+      }
+    }
   },
   typography: {
     fontFamily: 'Roboto, Arial, sans-serif',

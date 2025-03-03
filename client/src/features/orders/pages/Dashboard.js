@@ -24,6 +24,7 @@ import {
   Tab,
   TextField,
   InputAdornment,
+  useTheme,
 } from '@mui/material';
 import { Navigate, useNavigate } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -34,6 +35,7 @@ import apiProtected from '../../../services/api/secureApi';
 const Dashboard = () => {
   const { user, loading } = useContext(AuthContext);
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const [orders, setOrders] = useState([]);
   const [orderStatuses, setOrderStatuses] = useState([]);
@@ -165,30 +167,30 @@ const Dashboard = () => {
       case 1: // Created
       case 2: // Submitted
         return {
-          backgroundColor: '#e8e0ff',
-          color: '#5a3dbf',
-          border: '1px solid #d4c6ff'
+          backgroundColor: theme.palette.status.initial.backgroundColor,
+          color: theme.palette.status.initial.color,
+          border: `1px solid ${theme.palette.status.initial.border}`
         };
       case 3: // Received
       case 4: // Processing
       case 5: // Shipped
       case 6: // In Transit
         return {
-          backgroundColor: '#e0f0ff',
-          color: '#1976d2',
-          border: '1px solid #c6e2ff'
+          backgroundColor: theme.palette.status.inProgress.backgroundColor,
+          color: theme.palette.status.inProgress.color,
+          border: `1px solid ${theme.palette.status.inProgress.border}`
         };
       case 7: // Delivered
         return {
-          backgroundColor: '#e6f5e6',
-          color: '#2e7d32',
-          border: '1px solid #c8e6c9'
+          backgroundColor: theme.palette.status.completed.backgroundColor,
+          color: theme.palette.status.completed.color,
+          border: `1px solid ${theme.palette.status.completed.border}`
         };
       default:
         return {
-          backgroundColor: '#f5f5f5',
-          color: '#616161',
-          border: '1px solid #e0e0e0'
+          backgroundColor: theme.palette.status.default.backgroundColor,
+          color: theme.palette.status.default.color,
+          border: `1px solid ${theme.palette.status.default.border}`
         };
     }
   };
