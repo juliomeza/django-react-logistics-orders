@@ -26,8 +26,6 @@ class Address(TimeStampedModel):
         return f"{self.address_line_1}, {self.city}, {self.state} {self.postal_code}"
 
 class Contact(TimeStampedModel):
-    # first_name = models.CharField(max_length=50)
-    # last_name = models.CharField(max_length=50)
     company_name = models.CharField(max_length=100)
     contact_name = models.CharField(max_length=100)
     attention = models.CharField(max_length=100, blank=True)
