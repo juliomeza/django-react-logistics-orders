@@ -224,7 +224,7 @@ const OrderSummary = ({
         </Typography>
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <Typography variant="body2" color="text.secondary">Contact</Typography>
+            <Typography variant="body2" color="text.secondary">Customer</Typography>
             <Typography variant="body1">{getContactName(orderData.contact)}</Typography>
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>

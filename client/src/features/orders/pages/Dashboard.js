@@ -38,6 +38,8 @@ const Dashboard = () => {
   const [orders, setOrders] = useState([]);
   const [orderStatuses, setOrderStatuses] = useState([]);
   const [orderTypes, setOrderTypes] = useState([]);
+  const [contacts, setContacts] = useState([]);
+  const [addresses, setAddresses] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [selectedTab, setSelectedTab] = useState(0); // 0 para Outbound, 1 para Inbound
   const [ordersLoading, setOrdersLoading] = useState(true);
@@ -51,14 +53,18 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [ordersRes, statusesRes, typesRes] = await Promise.all([
+        const [ordersRes, statusesRes, typesRes, contactsRes, addressesRes] = await Promise.all([
           apiProtected.get('orders/'),
           apiProtected.get('order-statuses/'),
           apiProtected.get('order-types/'),
+          apiProtected.get('contacts/'),
+          apiProtected.get('addresses/'),
         ]);
         setOrders(ordersRes.data);
         setOrderStatuses(statusesRes.data);
         setOrderTypes(typesRes.data);
+        setContacts(contactsRes.data);
+        setAddresses(addressesRes.data);
       } catch (err) {
         setOrdersError('Error loading orders or statuses.');
       } finally {
@@ -72,10 +78,26 @@ const Dashboard = () => {
   }, [user]);
 
   const filteredOrders = orders.filter(order => {
-    // Filtramos según el texto de búsqueda (Order Number o Reference Number)
+    // Obtenemos el contacto y la dirección asociados a esta orden
+    const contact = contacts.find(c => c.id === order.contact);
+    const address = addresses.find(a => a.id === order.shipping_address);
+    
+    // Datos del cliente para búsqueda
+    const companyName = contact?.company_name || '';
+    const contactName = contact?.contact_name || '';
+    
+    // Datos de destino para búsqueda
+    const city = address?.city || '';
+    const state = address?.state || '';
+    
+    // Filtramos según el texto de búsqueda (ahora incluye Customer y Destination)
     const searchMatch = searchText === '' || 
       (order.lookup_code_order && order.lookup_code_order.toLowerCase().includes(searchText.toLowerCase())) ||
-      (order.reference_number && order.reference_number.toLowerCase().includes(searchText.toLowerCase()));
+      (order.reference_number && order.reference_number.toLowerCase().includes(searchText.toLowerCase())) ||
+      companyName.toLowerCase().includes(searchText.toLowerCase()) ||
+      contactName.toLowerCase().includes(searchText.toLowerCase()) ||
+      city.toLowerCase().includes(searchText.toLowerCase()) ||
+      state.toLowerCase().includes(searchText.toLowerCase());
     
     // Filtramos según la pestaña activa (Outbound o Inbound)
     // Asumimos que los tipos están divididos entre Inbound y Outbound
@@ -163,17 +185,19 @@ const Dashboard = () => {
       <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 3, gap: 2 }}>
         <TextField
           id="search-box"
-          label="Search Order or Reference Number"
+          label="Search by Order, Reference, Customer or Destination"
           variant="outlined"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          sx={{ minWidth: 300 }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
+          sx={{ minWidth: 400 }}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            },
           }}
         />
       </Box>
@@ -194,19 +218,41 @@ const Dashboard = () => {
               <TableRow>
                 <TableCell><Typography variant="subtitle2">Order</Typography></TableCell>
                 <TableCell><Typography variant="subtitle2">Reference Number</Typography></TableCell>
+                <TableCell><Typography variant="subtitle2">Customer</Typography></TableCell>
+                <TableCell><Typography variant="subtitle2">Destination</Typography></TableCell>
                 <TableCell><Typography variant="subtitle2">Status</Typography></TableCell>
-                <TableCell><Typography variant="subtitle2">Actions</Typography></TableCell>
+                <TableCell></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {filteredOrders.map((order) => {
                 const status = orderStatuses.find(s => s.id === order.order_status)?.status_name || 'Unknown';
                 const canEdit = isCreatedStatus(order.order_status);
+                
+                // Obtener el contacto asociado a esta orden
+                const contact = contacts.find(c => c.id === order.contact);
+                
+                // Determinar el valor para mostrar como customer (company_name o contact_name)
+                let customerDisplay = '-';
+                if (contact) {
+                  customerDisplay = contact.company_name || contact.contact_name || '-';
+                }
+
+                // Obtener el shipping address asociado a esta orden
+                const address = addresses.find(a => a.id === order.shipping_address);
+                
+                // Determinar el valor para mostrar como destination (City - State)
+                let destinationDisplay = '-';
+                if (address && address.city && address.state) {
+                  destinationDisplay = `${address.city} - ${address.state}`;
+                }
 
                 return (
                   <TableRow key={order.id} hover sx={{ cursor: 'pointer' }}>
                     <TableCell>{order.lookup_code_order}</TableCell>
                     <TableCell>{order.reference_number || '-'}</TableCell>
+                    <TableCell>{customerDisplay}</TableCell>
+                    <TableCell>{destinationDisplay}</TableCell>
                     <TableCell>{status}</TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', gap: 1 }}>
