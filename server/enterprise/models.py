@@ -40,6 +40,11 @@ class Client(TimeStampedModel):
         return self.name
 
 class Project(TimeStampedModel):
+    EXPORT_FORMAT_CHOICES = [
+        ('JSON', 'JSON File'),
+        ('CSV', 'CSV File')
+    ]
+
     is_active = models.BooleanField(default=True)
     name = models.CharField(max_length=100)
     lookup_code = models.CharField(max_length=50, unique=True)
@@ -61,7 +66,12 @@ class Project(TimeStampedModel):
     carriers = models.ManyToManyField('logistics.Carrier', related_name="projects", blank=True)
     services = models.ManyToManyField('logistics.CarrierService', related_name="projects", blank=True)
     contacts = models.ManyToManyField('logistics.Contact', related_name="projects", blank=True)
-
+    export_format = models.CharField(
+        max_length=4,
+        choices=EXPORT_FORMAT_CHOICES,
+        default='JSON',
+        help_text="Export format for orders"
+    )
     notes = models.TextField(blank=True)
 
     def __str__(self):
