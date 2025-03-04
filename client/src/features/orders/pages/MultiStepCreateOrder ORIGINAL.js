@@ -18,7 +18,7 @@ const MultiStepCreateOrder = () => {
   const { orderId: orderIdFromParams } = useParams();
 
   const [formData, dispatch] = useReducer(formReducer, initialFormState);
-  const { data: referenceData, refetchReferenceData } = useReferenceData(user); // Eliminamos loading y refError
+  const referenceData = useReferenceData(user);
   const inventoriesAndMaterials = useInventoriesAndMaterials(user, formData.warehouse);
 
   const [orderId, setOrderId] = useState(null);
@@ -28,6 +28,7 @@ const MultiStepCreateOrder = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const steps = ['Order Details', 'Materials', 'Review'];
 
+  // Determina si la orden está bloqueada (creada o en edición)
   const isOrderLocked = !!(orderId || orderIdFromParams);
 
   useEffect(() => {
@@ -37,13 +38,13 @@ const MultiStepCreateOrder = () => {
           const orderResponse = await apiProtected.get(`orders/${orderIdFromParams}/`);
           const order = orderResponse.data;
           console.log('Loaded order data:', order);
-
+  
           const linesResponse = await apiProtected.get(`order-lines/order/${orderIdFromParams}/`);
           console.log('Loaded order lines:', linesResponse.data);
-
-          dispatch({
-            type: 'SET_FORM_DATA',
-            data: {
+  
+          dispatch({ 
+            type: 'SET_FORM_DATA', 
+            data: { 
               ...order,
               reference_number: order.reference_number ?? '',
               notes: order.notes ?? '',
@@ -58,13 +59,13 @@ const MultiStepCreateOrder = () => {
               shipping_address: order.shipping_address ?? '',
               billing_address: order.billing_address ?? '',
               lookup_code_order: order.lookup_code_order ?? '',
-              selectedInventories: linesResponse.data.map((line) => ({
+              selectedInventories: linesResponse.data.map(line => ({
                 id: line.id,
                 material: line.material,
                 license_plate: line.license_plate,
                 orderQuantity: line.quantity,
-              })),
-            },
+              }))
+            }
           });
           setOrderId(orderIdFromParams);
           setCurrentStep(0);
@@ -208,18 +209,16 @@ const MultiStepCreateOrder = () => {
           <OrderDetailsStep
             formData={formData}
             handleChange={handleChange}
-            orderTypes={referenceData.orderTypes}
-            orderClasses={referenceData.orderClasses}
-            warehouses={referenceData.warehouses}
-            projects={referenceData.projects}
-            carriers={referenceData.carriers}
-            carrierServices={referenceData.carrierServices}
-            contacts={referenceData.contacts}
-            addresses={referenceData.addresses}
+            orderTypes={referenceData.data.orderTypes}
+            orderClasses={referenceData.data.orderClasses}
+            warehouses={referenceData.data.warehouses}
+            projects={referenceData.data.projects}
+            carriers={referenceData.data.carriers}
+            carrierServices={referenceData.data.carrierServices}
+            contacts={referenceData.data.contacts}
+            addresses={referenceData.data.addresses}
             formErrors={formErrors}
-            isOrderLocked={isOrderLocked}
-            user={user}
-            refetchReferenceData={refetchReferenceData}
+            isOrderLocked={isOrderLocked} // Pasamos la prop
           />
         );
       case 1:
@@ -238,19 +237,19 @@ const MultiStepCreateOrder = () => {
         return (
           <ReviewStep
             formData={formData}
-            orderTypes={referenceData.orderTypes}
-            orderClasses={referenceData.orderClasses}
-            warehouses={referenceData.warehouses}
-            projects={referenceData.projects}
-            carriers={referenceData.carriers}
-            carrierServices={referenceData.carrierServices}
-            contacts={referenceData.contacts}
-            addresses={referenceData.addresses}
+            orderTypes={referenceData.data.orderTypes}
+            orderClasses={referenceData.data.orderClasses}
+            warehouses={referenceData.data.warehouses}
+            projects={referenceData.data.projects}
+            carriers={referenceData.data.carriers}
+            carrierServices={referenceData.data.carrierServices}
+            contacts={referenceData.data.contacts}
+            addresses={referenceData.data.addresses}
             materials={inventoriesAndMaterials.materials}
           />
         );
       default:
-      return null;
+        return null;
     }
   };
 
