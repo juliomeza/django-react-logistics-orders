@@ -185,6 +185,21 @@ const OrderDetailsDeliveryInformation = ({
           address_type: 'billing',
         },
       }));
+    } else {
+      // Si se desmarca el checkbox, resetear los campos de billing
+      setNewContact((prev) => ({
+        ...prev,
+        billing_address: {
+          address_line_1: '',
+          address_line_2: '',
+          city: '',
+          state: '',
+          postal_code: '',
+          country: '',
+          entity_type: 'recipient',
+          address_type: 'billing',
+        },
+      }));
     }
   };
 
