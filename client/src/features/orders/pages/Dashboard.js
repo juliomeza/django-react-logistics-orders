@@ -26,6 +26,7 @@ import {
   InputAdornment,
   useTheme,
   Collapse,
+  Chip,
 } from '@mui/material';
 import { Navigate, useNavigate } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -223,13 +224,40 @@ const Dashboard = () => {
           }}
           onClick={() => setIsOpen(!isOpen)}
         >
-          <Box>
-            <Typography variant="h6" sx={{ fontWeight: 600 }}>{title}</Typography>
-            <Typography variant="body2" color="text.secondary">{subtitle}</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                {title}
+                {!isOpen && (
+                  <Chip
+                    label={orders.length}
+                    size="small"
+                    color="primary"
+                    sx={{ 
+                      ml: 1,
+                      height: '22px',
+                      fontSize: '0.75rem',
+                      '& .MuiChip-label': {
+                        paddingTop: '1px',
+                        lineHeight: 1
+                      }
+                    }}
+                  />
+                )}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">{subtitle}</Typography>
+            </Box>
           </Box>
-          <IconButton size="small">
-            {isOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {isOpen && (
+              <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }}>
+                {orders.length} {orders.length === 1 ? 'order' : 'orders'}
+              </Typography>
+            )}
+            <IconButton size="small">
+              {isOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            </IconButton>
+          </Box>
         </Paper>
         
         <Collapse in={isOpen} timeout="auto" unmountOnExit>
