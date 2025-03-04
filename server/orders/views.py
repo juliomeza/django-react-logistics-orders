@@ -31,10 +31,32 @@ class OrderViewSet(viewsets.ModelViewSet):
             return Order.objects.none()
         user_projects = self.request.user.projects.all()
         return Order.objects.filter(project__in=user_projects)
+    
+    def perform_create(self, serializer):
+        """Asigna el usuario autenticado como created_by al crear una orden."""
+        serializer.save(created_by=self.request.user, modified_by=self.request.user)
+
+    def perform_update(self, serializer):
+        """Asigna el usuario autenticado como modified_by al actualizar una orden."""
+        serializer.save(modified_by=self.request.user)
 
 class OrderLineViewSet(viewsets.ModelViewSet):
     queryset = OrderLine.objects.all()
     serializer_class = OrderLineSerializer
+
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return OrderLine.objects.none()
+        user_projects = self.request.user.projects.all()
+        return OrderLine.objects.filter(order__project__in=user_projects)
+
+    def perform_create(self, serializer):
+        """Asigna el usuario autenticado como created_by al crear una línea de orden."""
+        serializer.save(created_by=self.request.user, modified_by=self.request.user)
+
+    def perform_update(self, serializer):
+        """Asigna el usuario autenticado como modified_by al actualizar una línea de orden."""
+        serializer.save(modified_by=self.request.user)
 
     # Custom action to delete all lines for an order
     @action(detail=False, methods=['delete'], url_path='order/(?P<order_id>[^/.]+)/clear')
