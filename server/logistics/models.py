@@ -37,7 +37,17 @@ class Contact(TimeStampedModel):
     addresses = models.ManyToManyField(Address, related_name='contacts', blank=True)
 
     def __str__(self):
-        return f"{self.company_name} {self.contact_name}"
+        # Elegir el nombre a mostrar
+        display_name = self.company_name if self.company_name else self.contact_name
+        
+        # Obtener la ciudad del address tipo shipping
+        try:
+            shipping_address = self.addresses.filter(address_type='shipping').first()
+            city = shipping_address.city if shipping_address else "No City"
+        except:
+            city = "No City"
+            
+        return f"{display_name} - {city}"
 
 class Warehouse(TimeStampedModel):
     name = models.CharField(max_length=100)
