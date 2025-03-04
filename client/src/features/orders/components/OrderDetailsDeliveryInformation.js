@@ -1,7 +1,8 @@
-import React, { useState, useRef } from 'react'; // Añadimos useRef
-import { Paper, Typography, TextField, Autocomplete, Box, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import React, { useState, useRef } from 'react';
+import { Paper, Typography, TextField, Autocomplete, Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Checkbox, FormControlLabel } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import apiProtected from '../../../services/api/secureApi';
+import { createFilterOptions } from '@mui/material/Autocomplete';
 
 const OrderDetailsDeliveryInformation = ({
   formData,
@@ -15,6 +16,7 @@ const OrderDetailsDeliveryInformation = ({
   refetchReferenceData,
 }) => {
   const [openModal, setOpenModal] = useState(false);
+  const [openWarningDialog, setOpenWarningDialog] = useState(false);
   const [newContact, setNewContact] = useState({
     company_name: '',
     contact_name: '',
@@ -45,8 +47,9 @@ const OrderDetailsDeliveryInformation = ({
       address_type: 'billing',
     },
   });
+  const [sameBillingAddress, setSameBillingAddress] = useState(true);
   const [modalErrors, setModalErrors] = useState({});
-  const addNewContactButtonRef = useRef(null); // Referencia al botón "Add New Contact"
+  const addNewContactButtonRef = useRef(null);
 
   const formatDateForInput = (dateString) => {
     if (!dateString) return '';
@@ -69,6 +72,25 @@ const OrderDetailsDeliveryInformation = ({
     return { ...contact, label: city ? `${displayName} - ${city}` : displayName };
   });
 
+  // Configuración del filtro para Autocomplete con opción de agregar contacto
+  const filterOptions = createFilterOptions({
+    matchFrom: 'any',
+    stringify: (option) => option.label || '',
+  });
+
+  const customFilterOptions = (options, params) => {
+    const filtered = filterOptions(options, params);
+    
+    // Siempre agregar la opción "Add New Contact" al final
+    filtered.push({
+      inputValue: params.inputValue,
+      label: 'Add New Contact',
+      isAddOption: true
+    });
+    
+    return filtered;
+  };
+
   const selectedContact = formData.contact
     ? contactOptions.find((c) => c.id === formData.contact) || null
     : null;
@@ -81,21 +103,27 @@ const OrderDetailsDeliveryInformation = ({
     ? addresses.find((a) => a.id === formData.billing_address)
     : null;
 
-  const handleContactChange = (event, selectedContact) => {
-    if (!selectedContact) {
+  const handleContactChange = (event, selectedOption) => {
+    // Si se selecciona la opción "Add New Contact"
+    if (selectedOption && selectedOption.isAddOption) {
+      handleOpenModal();
+      return;
+    }
+    
+    if (!selectedOption) {
       handleChange({ target: { name: 'contact', value: '' } });
       handleChange({ target: { name: 'shipping_address', value: '' } });
       handleChange({ target: { name: 'billing_address', value: '' } });
       return;
     }
 
-    handleChange({ target: { name: 'contact', value: selectedContact.id } });
+    handleChange({ target: { name: 'contact', value: selectedOption.id } });
     handleChange({ target: { name: 'shipping_address', value: '' } });
     handleChange({ target: { name: 'billing_address', value: '' } });
 
-    if (selectedContact.addresses?.length > 0) {
+    if (selectedOption.addresses?.length > 0) {
       const contactAddressList = addresses.filter((addr) =>
-        selectedContact.addresses.includes(addr.id)
+        selectedOption.addresses.includes(addr.id)
       );
       const shippingAddr = contactAddressList.find((addr) => addr.address_type === 'shipping');
       const billingAddr = contactAddressList.find((addr) => addr.address_type === 'billing');
@@ -130,10 +158,35 @@ const OrderDetailsDeliveryInformation = ({
         ...prev,
         [addressType]: { ...prev[addressType], [name]: value },
       }));
+
+      // Si se cambió shipping_address y el checkbox de misma dirección está marcado,
+      // actualizar también billing_address
+      if (addressType === 'shipping_address' && sameBillingAddress) {
+        setNewContact((prev) => ({
+          ...prev,
+          billing_address: { ...prev.billing_address, [name]: value },
+        }));
+      }
     } else {
       setNewContact((prev) => ({ ...prev, [name]: value }));
     }
     setModalErrors((prev) => ({ ...prev, [name]: false }));
+  };
+
+  const handleSameAddressChange = (e) => {
+    const checked = e.target.checked;
+    setSameBillingAddress(checked);
+    
+    if (checked) {
+      // Si se marca el checkbox, copiar todos los campos de shipping a billing
+      setNewContact((prev) => ({
+        ...prev,
+        billing_address: {
+          ...prev.shipping_address,
+          address_type: 'billing',
+        },
+      }));
+    }
   };
 
   const validateForm = () => {
@@ -141,21 +194,32 @@ const OrderDetailsDeliveryInformation = ({
     if (!newContact.company_name) errors.company_name = true;
     if (!newContact.contact_name) errors.contact_name = true;
     if (!newContact.phone) errors.phone = true;
-    ['shipping_address', 'billing_address'].forEach((type) => {
-      const addr = newContact[type];
-      if (!addr.address_line_1) errors[`${type}_address_line_1`] = true;
-      if (!addr.city) errors[`${type}_city`] = true;
-      if (!addr.state) errors[`${type}_state`] = true;
-      if (!addr.postal_code) errors[`${type}_postal_code`] = true;
-      if (!addr.country) errors[`${type}_country`] = true;
-    });
+    
+    // Validar shipping_address
+    const shipping = newContact.shipping_address;
+    if (!shipping.address_line_1) errors.shipping_address_address_line_1 = true;
+    if (!shipping.city) errors.shipping_address_city = true;
+    if (!shipping.state) errors.shipping_address_state = true;
+    if (!shipping.postal_code) errors.shipping_address_postal_code = true;
+    if (!shipping.country) errors.shipping_address_country = true;
+    
+    // Validar billing_address solo si no es la misma que shipping
+    if (!sameBillingAddress) {
+      const billing = newContact.billing_address;
+      if (!billing.address_line_1) errors.billing_address_address_line_1 = true;
+      if (!billing.city) errors.billing_address_city = true;
+      if (!billing.state) errors.billing_address_state = true;
+      if (!billing.postal_code) errors.billing_address_postal_code = true;
+      if (!billing.country) errors.billing_address_country = true;
+    }
+    
     setModalErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleOpenModal = () => {
     if (!formData.project) {
-      alert('You must first select a project in the "Logistics Information" section before creating a new contact.');
+      setOpenWarningDialog(true);
       return;
     }
     setOpenModal(true);
@@ -253,9 +317,8 @@ const OrderDetailsDeliveryInformation = ({
       // 6. Refrescar los datos de referencia
       await refetchReferenceData();
 
-      // 7. Cerrar el modal y devolver el foco al botón "Add New Contact"
+      // 7. Cerrar el modal
       setOpenModal(false);
-      addNewContactButtonRef.current?.focus();
 
       setNewContact({
         company_name: '',
@@ -326,7 +389,29 @@ const OrderDetailsDeliveryInformation = ({
             options={contactOptions}
             value={selectedContact}
             onChange={handleContactChange}
-            getOptionLabel={(option) => option?.label || ''}
+            getOptionLabel={(option) => {
+              // Evitar errores con opciones no válidas
+              if (typeof option === 'string') return option;
+              return option?.label || '';
+            }}
+            renderOption={(props, option) => {
+              // Extraer la key del objeto props para evitar el warning
+              const { key, ...otherProps } = props;
+              
+              // Renderizar la opción "Add New Contact" con estilo diferente
+              if (option.isAddOption) {
+                return (
+                  <li key={key} {...otherProps} style={{ fontWeight: 'bold', color: '#1976d2' }}>
+                    <Box component="span" sx={{ display: 'flex', alignItems: 'center' }}>
+                      + {option.label}
+                    </Box>
+                  </li>
+                );
+              }
+              // Renderizar opciones normales
+              return <li key={key} {...otherProps}>{option.label}</li>;
+            }}
+            filterOptions={customFilterOptions}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -339,14 +424,6 @@ const OrderDetailsDeliveryInformation = ({
             isOptionEqualToValue={(option, value) => option?.id === value?.id}
             disabled={isOrderLocked}
           />
-          <Button
-            ref={addNewContactButtonRef} // Añadimos la referencia
-            onClick={handleOpenModal}
-            sx={{ mt: 1 }}
-            disabled={isOrderLocked}
-          >
-            Add New Contact
-          </Button>
         </Grid>
 
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -413,122 +490,148 @@ const OrderDetailsDeliveryInformation = ({
       <Dialog open={openModal} onClose={() => setOpenModal(false)} maxWidth="md" fullWidth>
         <DialogTitle>Create New Contact</DialogTitle>
         <DialogContent>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                label="Company Name *"
-                name="company_name"
-                value={newContact.company_name}
-                onChange={handleNewContactChange}
-                fullWidth
-                error={!!modalErrors.company_name}
-                helperText={modalErrors.company_name && 'Required'}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                label="Contact Name *"
-                name="contact_name"
-                value={newContact.contact_name}
-                onChange={handleNewContactChange}
-                fullWidth
-                error={!!modalErrors.contact_name}
-                helperText={modalErrors.contact_name && 'Required'}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                label="Phone *"
-                name="phone"
-                value={newContact.phone}
-                onChange={handleNewContactChange}
-                fullWidth
-                error={!!modalErrors.phone}
-                helperText={modalErrors.phone && 'Required'}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                label="Email"
-                name="email"
-                value={newContact.email}
-                onChange={handleNewContactChange}
-                fullWidth
-              />
-            </Grid>
-            <Grid size={{ xs: 12 }}>
-              <Typography variant="subtitle1" sx={{ mt: 2 }}>
-                Shipping Address
-              </Typography>
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 12 }}>
-                  <TextField
-                    label="Address Line 1 *"
-                    name="address_line_1"
-                    value={newContact.shipping_address.address_line_1}
-                    onChange={(e) => handleNewContactChange(e, 'shipping_address')}
-                    fullWidth
-                    error={!!modalErrors.shipping_address_address_line_1}
-                    helperText={modalErrors.shipping_address_address_line_1 && 'Required'}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12 }}>
-                  <TextField
-                    label="Address Line 2"
-                    name="address_line_2"
-                    value={newContact.shipping_address.address_line_2}
-                    onChange={(e) => handleNewContactChange(e, 'shipping_address')}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid size={{ xs: 6 }}>
-                  <TextField
-                    label="City *"
-                    name="city"
-                    value={newContact.shipping_address.city}
-                    onChange={(e) => handleNewContactChange(e, 'shipping_address')}
-                    fullWidth
-                    error={!!modalErrors.shipping_address_city}
-                    helperText={modalErrors.shipping_address_city && 'Required'}
-                  />
-                </Grid>
-                <Grid size={{ xs: 6 }}>
-                  <TextField
-                    label="State *"
-                    name="state"
-                    value={newContact.shipping_address.state}
-                    onChange={(e) => handleNewContactChange(e, 'shipping_address')}
-                    fullWidth
-                    error={!!modalErrors.shipping_address_state}
-                    helperText={modalErrors.shipping_address_state && 'Required'}
-                  />
-                </Grid>
-                <Grid size={{ xs: 6 }}>
-                  <TextField
-                    label="Postal Code *"
-                    name="postal_code"
-                    value={newContact.shipping_address.postal_code}
-                    onChange={(e) => handleNewContactChange(e, 'shipping_address')}
-                    fullWidth
-                    error={!!modalErrors.shipping_address_postal_code}
-                    helperText={modalErrors.shipping_address_postal_code && 'Required'}
-                  />
-                </Grid>
-                <Grid size={{ xs: 6 }}>
-                  <TextField
-                    label="Country *"
-                    name="country"
-                    value={newContact.shipping_address.country}
-                    onChange={(e) => handleNewContactChange(e, 'shipping_address')}
-                    fullWidth
-                    error={!!modalErrors.shipping_address_country}
-                    helperText={modalErrors.shipping_address_country && 'Required'}
-                  />
-                </Grid>
+          {/* Información de contacto */}
+          <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
+            <Typography variant="subtitle1" sx={{ mb: 2 }}>
+              Contact Information
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label="Company Name *"
+                  name="company_name"
+                  value={newContact.company_name}
+                  onChange={handleNewContactChange}
+                  fullWidth
+                  error={!!modalErrors.company_name}
+                  helperText={modalErrors.company_name && 'Required'}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label="Contact Name *"
+                  name="contact_name"
+                  value={newContact.contact_name}
+                  onChange={handleNewContactChange}
+                  fullWidth
+                  error={!!modalErrors.contact_name}
+                  helperText={modalErrors.contact_name && 'Required'}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label="Phone *"
+                  name="phone"
+                  value={newContact.phone}
+                  onChange={handleNewContactChange}
+                  fullWidth
+                  error={!!modalErrors.phone}
+                  helperText={modalErrors.phone && 'Required'}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label="Email"
+                  name="email"
+                  value={newContact.email}
+                  onChange={handleNewContactChange}
+                  fullWidth
+                />
               </Grid>
             </Grid>
-            <Grid size={{ xs: 12 }}>
-              <Typography variant="subtitle1" sx={{ mt: 2 }}>
+          </Paper>
+
+          {/* Dirección de envío */}
+          <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
+            <Typography variant="subtitle1" sx={{ mb: 2 }}>
+              Shipping Address
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12 }}>
+                <TextField
+                  label="Address Line 1 *"
+                  name="address_line_1"
+                  value={newContact.shipping_address.address_line_1}
+                  onChange={(e) => handleNewContactChange(e, 'shipping_address')}
+                  fullWidth
+                  error={!!modalErrors.shipping_address_address_line_1}
+                  helperText={modalErrors.shipping_address_address_line_1 && 'Required'}
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <TextField
+                  label="Address Line 2"
+                  name="address_line_2"
+                  value={newContact.shipping_address.address_line_2}
+                  onChange={(e) => handleNewContactChange(e, 'shipping_address')}
+                  fullWidth
+                />
+              </Grid>
+              <Grid size={{ xs: 6 }}>
+                <TextField
+                  label="City *"
+                  name="city"
+                  value={newContact.shipping_address.city}
+                  onChange={(e) => handleNewContactChange(e, 'shipping_address')}
+                  fullWidth
+                  error={!!modalErrors.shipping_address_city}
+                  helperText={modalErrors.shipping_address_city && 'Required'}
+                />
+              </Grid>
+              <Grid size={{ xs: 6 }}>
+                <TextField
+                  label="State *"
+                  name="state"
+                  value={newContact.shipping_address.state}
+                  onChange={(e) => handleNewContactChange(e, 'shipping_address')}
+                  fullWidth
+                  error={!!modalErrors.shipping_address_state}
+                  helperText={modalErrors.shipping_address_state && 'Required'}
+                />
+              </Grid>
+              <Grid size={{ xs: 6 }}>
+                <TextField
+                  label="Postal Code *"
+                  name="postal_code"
+                  value={newContact.shipping_address.postal_code}
+                  onChange={(e) => handleNewContactChange(e, 'shipping_address')}
+                  fullWidth
+                  error={!!modalErrors.shipping_address_postal_code}
+                  helperText={modalErrors.shipping_address_postal_code && 'Required'}
+                />
+              </Grid>
+              <Grid size={{ xs: 6 }}>
+                <TextField
+                  label="Country *"
+                  name="country"
+                  value={newContact.shipping_address.country}
+                  onChange={(e) => handleNewContactChange(e, 'shipping_address')}
+                  fullWidth
+                  error={!!modalErrors.shipping_address_country}
+                  helperText={modalErrors.shipping_address_country && 'Required'}
+                />
+              </Grid>
+            </Grid>
+            
+            <Box sx={{ mt: 2 }}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={sameBillingAddress}
+                    onChange={handleSameAddressChange}
+                    name="sameAddress"
+                    color="primary"
+                  />
+                }
+                label="Billing address is the same as shipping address"
+              />
+            </Box>
+          </Paper>
+
+          {/* Dirección de facturación (se muestra solo si no es la misma que shipping) */}
+          {!sameBillingAddress && (
+            <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
+              <Typography variant="subtitle1" sx={{ mb: 2 }}>
                 Billing Address
               </Typography>
               <Grid container spacing={2}>
@@ -597,14 +700,51 @@ const OrderDetailsDeliveryInformation = ({
                   />
                 </Grid>
               </Grid>
-            </Grid>
-            {modalErrors.general && <Typography color="error">{modalErrors.general}</Typography>}
-          </Grid>
+            </Paper>
+          )}
+          
+          {modalErrors.general && (
+            <Typography color="error" sx={{ mt: 2 }}>
+              {modalErrors.general}
+            </Typography>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenModal(false)}>Cancel</Button>
           <Button onClick={handleSaveNewContact} variant="contained">
             Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Diálogo de advertencia cuando no se ha seleccionado un proyecto */}
+      <Dialog
+        open={openWarningDialog}
+        onClose={() => setOpenWarningDialog(false)}
+        aria-labelledby="project-required-dialog-title"
+      >
+        <DialogTitle id="project-required-dialog-title">
+          Project Required
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" color="text.secondary">
+            Please select a Project in the "Logistics Information" section before adding a new contact.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => setOpenWarningDialog(false)} 
+            color="primary"
+          >
+            CANCEL
+          </Button>
+          <Button 
+            onClick={() => setOpenWarningDialog(false)} 
+            color="primary" 
+            variant="contained"
+            autoFocus
+          >
+            OK
           </Button>
         </DialogActions>
       </Dialog>
