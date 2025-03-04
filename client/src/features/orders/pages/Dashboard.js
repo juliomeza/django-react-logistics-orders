@@ -43,7 +43,7 @@ const Dashboard = () => {
   const [contacts, setContacts] = useState([]);
   const [addresses, setAddresses] = useState([]);
   const [searchText, setSearchText] = useState('');
-  const [selectedTab, setSelectedTab] = useState(0); // 0 para Outbound, 1 para Inbound
+  const [selectedTab, setSelectedTab] = useState(0);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [ordersError, setOrdersError] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -79,53 +79,38 @@ const Dashboard = () => {
     }
   }, [user]);
 
-  const filteredOrders = orders.filter(order => {
-    // Obtenemos el contacto y la dirección asociados a esta orden
-    const contact = contacts.find(c => c.id === order.contact);
-    const address = addresses.find(a => a.id === order.shipping_address);
-    
-    // Datos del cliente para búsqueda
-    const companyName = contact?.company_name || '';
-    const contactName = contact?.contact_name || '';
-    
-    // Datos de destino para búsqueda
-    const city = address?.city || '';
-    const state = address?.state || '';
-    
-    // Filtramos según el texto de búsqueda (ahora incluye Customer y Destination)
-    const searchMatch = searchText === '' || 
-      (order.lookup_code_order && order.lookup_code_order.toLowerCase().includes(searchText.toLowerCase())) ||
-      (order.reference_number && order.reference_number.toLowerCase().includes(searchText.toLowerCase())) ||
-      companyName.toLowerCase().includes(searchText.toLowerCase()) ||
-      contactName.toLowerCase().includes(searchText.toLowerCase()) ||
-      city.toLowerCase().includes(searchText.toLowerCase()) ||
-      state.toLowerCase().includes(searchText.toLowerCase());
-    
-    // Filtramos según la pestaña activa (Outbound o Inbound)
-    // Asumimos que los tipos están divididos entre Inbound y Outbound
-    const outboundTypes = orderTypes
-      .filter(type => type.type_name?.toLowerCase().includes('outbound') || type.is_outbound)
-      .map(type => type.id);
-    
-    const inboundTypes = orderTypes
-      .filter(type => type.type_name?.toLowerCase().includes('inbound') || type.is_inbound)
-      .map(type => type.id);
-      
-    const tabMatch = selectedTab === 0
-      ? outboundTypes.includes(order.order_type)
-      : inboundTypes.includes(order.order_type);
-      
-    return searchMatch && tabMatch;
-  });
+  const filteredOrders = orders
+    .filter(order => {
+      const contact = contacts.find(c => c.id === order.contact);
+      const address = addresses.find(a => a.id === order.shipping_address);
+      const companyName = contact?.company_name || '';
+      const contactName = contact?.contact_name || '';
+      const city = address?.city || '';
+      const state = address?.state || '';
+      const searchMatch =
+        searchText === '' ||
+        (order.lookup_code_order && order.lookup_code_order.toLowerCase().includes(searchText.toLowerCase())) ||
+        (order.reference_number && order.reference_number.toLowerCase().includes(searchText.toLowerCase())) ||
+        companyName.toLowerCase().includes(searchText.toLowerCase()) ||
+        contactName.toLowerCase().includes(searchText.toLowerCase()) ||
+        city.toLowerCase().includes(searchText.toLowerCase()) ||
+        state.toLowerCase().includes(searchText.toLowerCase());
+      const outboundTypes = orderTypes
+        .filter(type => type.type_name?.toLowerCase().includes('outbound') || type.is_outbound)
+        .map(type => type.id);
+      const inboundTypes = orderTypes
+        .filter(type => type.type_name?.toLowerCase().includes('inbound') || type.is_inbound)
+        .map(type => type.id);
+      const tabMatch = selectedTab === 0 ? outboundTypes.includes(order.order_type) : inboundTypes.includes(order.order_type);
+      return searchMatch && tabMatch;
+    })
+    .sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
 
-  const handleEditClick = (orderId) => {
-    navigate(`/edit-order/${orderId}`);
-  };
+  const activeOrders = filteredOrders.filter(order => order.order_status !== 7);
+  const deliveredOrders = filteredOrders.filter(order => order.order_status === 7);
 
-  const handleViewClick = (orderId) => {
-    navigate(`/order/${orderId}`);
-  };
-
+  const handleEditClick = (orderId) => navigate(`/edit-order/${orderId}`);
+  const handleViewClick = (orderId) => navigate(`/order/${orderId}`);
   const handleDeleteClick = (orderId) => {
     setOrderToDelete(orderId);
     setDeleteDialogOpen(true);
@@ -133,11 +118,10 @@ const Dashboard = () => {
 
   const handleDeleteConfirm = async () => {
     if (!orderToDelete) return;
-
     try {
       await apiProtected.delete(`/order-lines/order/${orderToDelete}/clear/`);
       await apiProtected.delete(`/orders/${orderToDelete}/`);
-      setOrders((prevOrders) => prevOrders.filter((order) => order.id !== orderToDelete));
+      setOrders(prevOrders => prevOrders.filter(order => order.id !== orderToDelete));
       setSnackbarMessage('Order deleted successfully.');
       setSnackbarSeverity('success');
     } catch (err) {
@@ -156,99 +140,48 @@ const Dashboard = () => {
     setOrderToDelete(null);
   };
 
-  const handleTabChange = (event, newValue) => {
-    setSelectedTab(newValue);
-  };
+  const handleTabChange = (event, newValue) => setSelectedTab(newValue);
 
-  // Función para obtener el color del chip según el status ID
   const getStatusChipColor = (statusId) => {
-    // Agrupación de colores por tipo de estado
     switch (statusId) {
-      case 1: // Created
-      case 2: // Submitted
+      case 1: case 2:
         return {
           backgroundColor: theme.palette.status.initial.backgroundColor,
           color: theme.palette.status.initial.color,
-          border: `1px solid ${theme.palette.status.initial.border}`
+          border: `1px solid ${theme.palette.status.initial.border}`,
         };
-      case 3: // Received
-      case 4: // Processing
-      case 5: // Shipped
-      case 6: // In Transit
+      case 3: case 4: case 5: case 6:
         return {
           backgroundColor: theme.palette.status.inProgress.backgroundColor,
           color: theme.palette.status.inProgress.color,
-          border: `1px solid ${theme.palette.status.inProgress.border}`
+          border: `1px solid ${theme.palette.status.inProgress.border}`,
         };
-      case 7: // Delivered
+      case 7:
         return {
           backgroundColor: theme.palette.status.completed.backgroundColor,
           color: theme.palette.status.completed.color,
-          border: `1px solid ${theme.palette.status.completed.border}`
+          border: `1px solid ${theme.palette.status.completed.border}`,
         };
       default:
         return {
           backgroundColor: theme.palette.status.default.backgroundColor,
           color: theme.palette.status.default.color,
-          border: `1px solid ${theme.palette.status.default.border}`
+          border: `1px solid ${theme.palette.status.default.border}`,
         };
     }
   };
 
   const isCreatedStatus = (statusId) => statusId === 1;
 
-  if (loading) {
+  const renderOrdersTable = (orders, title, subtitle) => {
+    if (orders.length === 0) return null;
+
     return (
-      <Container maxWidth="md" sx={{ textAlign: 'center', mt: 4 }}>
-        <CircularProgress />
-        <Typography variant="h6" mt={2}>Loading...</Typography>
-      </Container>
-    );
-  }
-
-  if (!user) {
-    return <Navigate to="/login" />;
-  }
-
-  return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-        <Tabs value={selectedTab} onChange={handleTabChange} aria-label="order type tabs">
-          <Tab label="Outbound" />
-          <Tab label="Inbound" />
-        </Tabs>
-      </Box>
-      
-      <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 3, gap: 2 }}>
-        <TextField
-          id="search-box"
-          label="Search by Order, Reference, Customer or Destination"
-          variant="outlined"
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          sx={{ minWidth: 400 }}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
-      </Box>
-
-      {ordersLoading ? (
-        <Box sx={{ textAlign: 'center' }}>
-          <CircularProgress />
-          <Typography mt={2}>Loading orders...</Typography>
-        </Box>
-      ) : ordersError ? (
-        <Typography color="error" align="center">{ordersError}</Typography>
-      ) : filteredOrders.length === 0 ? (
-        <Typography align="center">There are no orders to show.</Typography>
-      ) : (
+      <Box sx={{ mb: 4 }}>
+        <Paper sx={{ p: 2, mb: 2, backgroundColor: '#f9fafb' }}>
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>{title}</Typography>
+          <Typography variant="body2" color="text.secondary">{subtitle}</Typography>
+        </Paper>
         <TableContainer component={Paper} sx={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
           <Table>
             <TableHead>
@@ -262,29 +195,14 @@ const Dashboard = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredOrders.map((order) => {
+              {orders.map((order) => {
                 const status = orderStatuses.find(s => s.id === order.order_status)?.status_name || 'Unknown';
-                const statusId = order.order_status;
-                const statusStyle = getStatusChipColor(statusId);
+                const statusStyle = getStatusChipColor(order.order_status);
                 const canEdit = isCreatedStatus(order.order_status);
-                
-                // Obtener el contacto asociado a esta orden
                 const contact = contacts.find(c => c.id === order.contact);
-                
-                // Determinar el valor para mostrar como customer (company_name o contact_name)
-                let customerDisplay = '-';
-                if (contact) {
-                  customerDisplay = contact.company_name || contact.contact_name || '-';
-                }
-
-                // Obtener el shipping address asociado a esta orden
+                const customerDisplay = contact ? (contact.company_name || contact.contact_name || '-') : '-';
                 const address = addresses.find(a => a.id === order.shipping_address);
-                
-                // Determinar el valor para mostrar como destination (City - State)
-                let destinationDisplay = '-';
-                if (address && address.city && address.state) {
-                  destinationDisplay = `${address.city} - ${address.state}`;
-                }
+                const destinationDisplay = address && address.city && address.state ? `${address.city} - ${address.state}` : '-';
 
                 return (
                   <TableRow key={order.id} hover sx={{ cursor: 'pointer' }}>
@@ -293,33 +211,27 @@ const Dashboard = () => {
                     <TableCell>{customerDisplay}</TableCell>
                     <TableCell>{destinationDisplay}</TableCell>
                     <TableCell>
-                      <span style={{
-                        display: 'inline-block',
-                        padding: '4px 10px',
-                        borderRadius: '16px',
-                        fontSize: '0.85rem',
-                        fontWeight: '500',
-                        ...statusStyle
-                      }}>
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          padding: '4px 10px',
+                          borderRadius: '16px',
+                          fontSize: '0.85rem',
+                          fontWeight: '500',
+                          ...statusStyle,
+                        }}
+                      >
                         {status}
                       </span>
                     </TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', gap: 1 }}>
                         {canEdit ? (
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            onClick={(e) => { e.stopPropagation(); handleEditClick(order.id); }}
-                          >
+                          <Button variant="outlined" size="small" onClick={(e) => { e.stopPropagation(); handleEditClick(order.id); }}>
                             Edit
                           </Button>
                         ) : (
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            onClick={(e) => { e.stopPropagation(); handleViewClick(order.id); }}
-                          >
+                          <Button variant="outlined" size="small" onClick={(e) => { e.stopPropagation(); handleViewClick(order.id); }}>
                             View
                           </Button>
                         )}
@@ -341,7 +253,86 @@ const Dashboard = () => {
             </TableBody>
           </Table>
         </TableContainer>
-      )}
+      </Box>
+    );
+  };
+
+  if (loading) {
+    return (
+      <Container maxWidth="md" sx={{ textAlign: 'center', mt: 4 }}>
+        <CircularProgress />
+        <Typography variant="h6" mt={2}>Loading...</Typography>
+      </Container>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
+  return (
+    <>
+      {/* Sección fija de Tabs y Search debajo del Header */}
+      <Box
+        sx={{
+          position: 'fixed',
+          top: '64px', // Altura predeterminada del AppBar/Toolbar
+          left: 0,
+          right: 0,
+          zIndex: 1100,
+          backgroundColor: 'background.paper',
+          boxShadow: '0px 2px 4px rgba(0,0,0,0.1)',
+          borderBottom: 1,
+          borderColor: 'divider',
+          py: 2,
+        }}
+      >
+        <Container maxWidth="lg">
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Tabs value={selectedTab} onChange={handleTabChange} aria-label="order type tabs">
+              <Tab label="Outbound" />
+              <Tab label="Inbound" />
+            </Tabs>
+            <TextField
+              id="search-box"
+              label="Search by Order, Reference, Customer or Destination"
+              variant="outlined"
+              size="small"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              sx={{ minWidth: 400 }}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+          </Box>
+        </Container>
+      </Box>
+
+      {/* Contenido desplazable */}
+      <Container maxWidth="lg" sx={{ mt: 14, mb: 4 }}>
+        {ordersLoading ? (
+          <Box sx={{ textAlign: 'center' }}>
+            <CircularProgress />
+            <Typography mt={2}>Loading orders...</Typography>
+          </Box>
+        ) : ordersError ? (
+          <Typography color="error" align="center">{ordersError}</Typography>
+        ) : filteredOrders.length === 0 ? (
+          <Typography align="center">There are no orders to show.</Typography>
+        ) : (
+          <>
+            {renderOrdersTable(activeOrders, 'Active Orders', 'Orders in initial stages and being processed')}
+            {renderOrdersTable(deliveredOrders, 'Recently Delivered', 'Displayed for 30 days after delivery')}
+          </>
+        )}
+      </Container>
 
       <Dialog
         open={deleteDialogOpen}
@@ -356,15 +347,9 @@ const Dashboard = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDeleteCancel} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleDeleteCancel} color="primary">
-            No
-          </Button>
-          <Button onClick={handleDeleteConfirm} color="error" autoFocus>
-            Yes
-          </Button>
+          <Button onClick={handleDeleteCancel} color="primary">Cancel</Button>
+          <Button onClick={handleDeleteCancel} color="primary">No</Button>
+          <Button onClick={handleDeleteConfirm} color="error" autoFocus>Yes</Button>
         </DialogActions>
       </Dialog>
 
@@ -374,15 +359,11 @@ const Dashboard = () => {
         onClose={() => setSnackbarOpen(false)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert
-          onClose={() => setSnackbarOpen(false)}
-          severity={snackbarSeverity}
-          sx={{ width: '100%' }}
-        >
+        <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>
-    </Container>
+    </>
   );
 };
 
