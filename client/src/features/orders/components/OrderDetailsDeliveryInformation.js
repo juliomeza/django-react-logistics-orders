@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Paper, Typography, TextField, Autocomplete, Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Checkbox, FormControlLabel } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import apiProtected from '../../../services/api/secureApi';
@@ -49,7 +49,6 @@ const OrderDetailsDeliveryInformation = ({
   });
   const [sameBillingAddress, setSameBillingAddress] = useState(true);
   const [modalErrors, setModalErrors] = useState({});
-  const addNewContactButtonRef = useRef(null);
 
   const formatDateForInput = (dateString) => {
     if (!dateString) return '';
