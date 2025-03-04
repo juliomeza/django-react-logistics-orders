@@ -25,10 +25,13 @@ import {
   TextField,
   InputAdornment,
   useTheme,
+  Collapse,
 } from '@mui/material';
 import { Navigate, useNavigate } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import AuthContext from '../../auth/AuthContext';
 import apiProtected from '../../../services/api/secureApi';
 
@@ -51,6 +54,10 @@ const Dashboard = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState(null);
+  
+  // Estados para el acordeón
+  const [activeOrdersOpen, setActiveOrdersOpen] = useState(true);
+  const [deliveredOrdersOpen, setDeliveredOrdersOpen] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -106,8 +113,30 @@ const Dashboard = () => {
     })
     .sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
 
+  // Función para verificar si una fecha está dentro de los últimos 30 días
+  const isWithinLast30Days = (dateString) => {
+    if (!dateString) return false;
+    
+    const currentDate = new Date();
+    const date = new Date(dateString);
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(currentDate.getDate() - 30);
+    
+    return date >= thirtyDaysAgo && date <= currentDate;
+  };
+
   const activeOrders = filteredOrders.filter(order => order.order_status !== 7);
-  const deliveredOrders = filteredOrders.filter(order => order.order_status === 7);
+  const deliveredOrders = filteredOrders.filter(order => {
+    if (order.order_status !== 7) return false;
+    
+    // Si hay delivery_date, verificar si está dentro de los últimos 30 días
+    if (order.delivery_date) {
+      return isWithinLast30Days(order.delivery_date);
+    } 
+    
+    // Si no hay delivery_date, usar modified_date como alternativa
+    return isWithinLast30Days(order.modified_date);
+  });
 
   const handleEditClick = (orderId) => navigate(`/edit-order/${orderId}`);
   const handleViewClick = (orderId) => navigate(`/order/${orderId}`);
@@ -173,86 +202,109 @@ const Dashboard = () => {
 
   const isCreatedStatus = (statusId) => statusId === 1;
 
-  const renderOrdersTable = (orders, title, subtitle) => {
+  const renderOrdersTable = (orders, title, subtitle, isOpen, setIsOpen) => {
     if (orders.length === 0) return null;
 
     return (
       <Box sx={{ mb: 4 }}>
-        <Paper sx={{ p: 2, mb: 2, backgroundColor: '#f9fafb' }}>
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>{title}</Typography>
-          <Typography variant="body2" color="text.secondary">{subtitle}</Typography>
+        <Paper 
+          sx={{ 
+            p: 2, 
+            mb: isOpen ? 2 : 0, 
+            backgroundColor: '#f9fafb',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              backgroundColor: '#eef0f2',
+            },
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>{title}</Typography>
+            <Typography variant="body2" color="text.secondary">{subtitle}</Typography>
+          </Box>
+          <IconButton size="small">
+            {isOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
         </Paper>
-        <TableContainer component={Paper} sx={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell><Typography variant="subtitle2">Order</Typography></TableCell>
-                <TableCell><Typography variant="subtitle2">Reference Number</Typography></TableCell>
-                <TableCell><Typography variant="subtitle2">Customer</Typography></TableCell>
-                <TableCell><Typography variant="subtitle2">Destination</Typography></TableCell>
-                <TableCell><Typography variant="subtitle2">Status</Typography></TableCell>
-                <TableCell></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {orders.map((order) => {
-                const status = orderStatuses.find(s => s.id === order.order_status)?.status_name || 'Unknown';
-                const statusStyle = getStatusChipColor(order.order_status);
-                const canEdit = isCreatedStatus(order.order_status);
-                const contact = contacts.find(c => c.id === order.contact);
-                const customerDisplay = contact ? (contact.company_name || contact.contact_name || '-') : '-';
-                const address = addresses.find(a => a.id === order.shipping_address);
-                const destinationDisplay = address && address.city && address.state ? `${address.city} - ${address.state}` : '-';
+        
+        <Collapse in={isOpen} timeout="auto" unmountOnExit>
+          <TableContainer component={Paper} sx={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell><Typography variant="subtitle2">Order</Typography></TableCell>
+                  <TableCell><Typography variant="subtitle2">Reference Number</Typography></TableCell>
+                  <TableCell><Typography variant="subtitle2">Customer</Typography></TableCell>
+                  <TableCell><Typography variant="subtitle2">Destination</Typography></TableCell>
+                  <TableCell><Typography variant="subtitle2">Status</Typography></TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {orders.map((order) => {
+                  const status = orderStatuses.find(s => s.id === order.order_status)?.status_name || 'Unknown';
+                  const statusStyle = getStatusChipColor(order.order_status);
+                  const canEdit = isCreatedStatus(order.order_status);
+                  const contact = contacts.find(c => c.id === order.contact);
+                  const customerDisplay = contact ? (contact.company_name || contact.contact_name || '-') : '-';
+                  const address = addresses.find(a => a.id === order.shipping_address);
+                  const destinationDisplay = address && address.city && address.state ? `${address.city} - ${address.state}` : '-';
 
-                return (
-                  <TableRow key={order.id} hover sx={{ cursor: 'pointer' }}>
-                    <TableCell>{order.lookup_code_order}</TableCell>
-                    <TableCell>{order.reference_number || '-'}</TableCell>
-                    <TableCell>{customerDisplay}</TableCell>
-                    <TableCell>{destinationDisplay}</TableCell>
-                    <TableCell>
-                      <span
-                        style={{
-                          display: 'inline-block',
-                          padding: '4px 10px',
-                          borderRadius: '16px',
-                          fontSize: '0.85rem',
-                          fontWeight: '500',
-                          ...statusStyle,
-                        }}
-                      >
-                        {status}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', gap: 1 }}>
-                        {canEdit ? (
-                          <Button variant="outlined" size="small" onClick={(e) => { e.stopPropagation(); handleEditClick(order.id); }}>
-                            Edit
-                          </Button>
-                        ) : (
-                          <Button variant="outlined" size="small" onClick={(e) => { e.stopPropagation(); handleViewClick(order.id); }}>
-                            View
-                          </Button>
-                        )}
-                        {canEdit && (
-                          <IconButton
-                            aria-label="delete"
-                            size="small"
-                            onClick={(e) => { e.stopPropagation(); handleDeleteClick(order.id); }}
-                            sx={{ color: 'error.main' }}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        )}
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                  return (
+                    <TableRow key={order.id} hover sx={{ cursor: 'pointer' }}>
+                      <TableCell>{order.lookup_code_order}</TableCell>
+                      <TableCell>{order.reference_number || '-'}</TableCell>
+                      <TableCell>{customerDisplay}</TableCell>
+                      <TableCell>{destinationDisplay}</TableCell>
+                      <TableCell>
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            padding: '4px 10px',
+                            borderRadius: '16px',
+                            fontSize: '0.85rem',
+                            fontWeight: '500',
+                            ...statusStyle,
+                          }}
+                        >
+                          {status}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                          {canEdit ? (
+                            <Button variant="outlined" size="small" onClick={(e) => { e.stopPropagation(); handleEditClick(order.id); }}>
+                              Edit
+                            </Button>
+                          ) : (
+                            <Button variant="outlined" size="small" onClick={(e) => { e.stopPropagation(); handleViewClick(order.id); }}>
+                              View
+                            </Button>
+                          )}
+                          {canEdit && (
+                            <IconButton
+                              aria-label="delete"
+                              size="small"
+                              onClick={(e) => { e.stopPropagation(); handleDeleteClick(order.id); }}
+                              sx={{ color: 'error.main' }}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          )}
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Collapse>
       </Box>
     );
   };
@@ -328,8 +380,8 @@ const Dashboard = () => {
           <Typography align="center">There are no orders to show.</Typography>
         ) : (
           <>
-            {renderOrdersTable(activeOrders, 'Active Orders', 'Orders in initial stages and being processed')}
-            {renderOrdersTable(deliveredOrders, 'Recently Delivered', 'Displayed for 30 days after delivery')}
+            {renderOrdersTable(activeOrders, 'Active Orders', 'Orders in initial stages and being processed', activeOrdersOpen, setActiveOrdersOpen)}
+            {renderOrdersTable(deliveredOrders, 'Recently Delivered', 'Displayed for 30 days after delivery', deliveredOrdersOpen, setDeliveredOrdersOpen)}
           </>
         )}
       </Container>
