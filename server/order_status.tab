@@ -1,0 +1,8 @@
+id	status_name	description	lookup_code
+1	Created	Order initiated, editable	01_created
+2	Submitted	Order sent, not editable by the user	02_submitted
+3	Received	Received by the WMS	03_received
+4	Processing	In preparation process	04_processing
+5	Shipped	Sent to the carrier	05_shipped
+6	In Transit	On the way to the destination	06_in_transit
+7	Delivered	Delivered to the customer	07_delivered
