@@ -9,6 +9,7 @@ from materials.views import UOMViewSet, MaterialTypeViewSet, MaterialViewSet, Ma
 from inventory.views import InventoryViewSet, InventorySerialNumberViewSet
 from logistics.views import AddressViewSet, ContactViewSet, WarehouseViewSet, CarrierViewSet, CarrierServiceViewSet
 from orders.views import OrderStatusViewSet, OrderTypeViewSet, OrderClassViewSet, OrderViewSet, OrderLineViewSet
+from reports.views import ReportViewSet
 
 # Swagger Configuration
 schema_view = get_schema_view(
@@ -45,6 +46,7 @@ router.register(r'order-types', OrderTypeViewSet)
 router.register(r'order-classes', OrderClassViewSet)
 router.register(r'orders', OrderViewSet)
 router.register(r'order-lines', OrderLineViewSet)
+router.register(r'reports', ReportViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
