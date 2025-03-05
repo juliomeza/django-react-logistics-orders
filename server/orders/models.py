@@ -7,6 +7,7 @@ from materials.models import Material
 from inventory.models import Inventory, InventorySerialNumber
 from django.db import transaction
 from django.utils import timezone
+from .utils import generate_order_csv
 
 class OrderStatus(TimeStampedModel):
     status_name = models.CharField(max_length=50)
@@ -108,20 +109,8 @@ class Order(TimeStampedModel):
         return code
     
     def generate_csv_file(self):
-        """Genera un archivo CSV básico para la orden en C:\test."""
-        file_path = f"\\\\wd02\\Datex\\Import\\CRM_Orders_Import\\Test\\order_{self.lookup_code_order}.csv"
-        with open(file_path, 'w', newline='') as csvfile:
-            writer = csv.writer(csvfile)
-            # Por ahora, escribimos datos básicos; luego ajustaremos las columnas
-            writer.writerow(['lookup_code_order', 'order_type', 'order_status'])
-            writer.writerow([
-                self.lookup_code_order,
-                self.order_type.type_name,
-                self.order_status.status_name
-            ])
-        # Actualizamos los campos file_generated y file_generated_at
-        self.file_generated = True
-        self.file_generated_at = timezone.now()
+        """Genera un archivo CSV para la orden usando la función en utils."""
+        generate_order_csv(self)
 
     def save(self, *args, **kwargs):
         """Sobrescribe el método save para detectar cambios de estado y generar el CSV."""
