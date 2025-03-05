@@ -1,4 +1,3 @@
-import csv
 from django.db import models
 from common.models import TimeStampedModel, Status
 from enterprise.models import Project
@@ -6,7 +5,6 @@ from logistics.models import Warehouse, Contact, Address, Carrier, CarrierServic
 from materials.models import Material
 from inventory.models import Inventory, InventorySerialNumber
 from django.db import transaction
-from django.utils import timezone
 
 class OrderStatus(TimeStampedModel):
     status_name = models.CharField(max_length=50)
@@ -106,35 +104,8 @@ class Order(TimeStampedModel):
         next_number = counter.get_next_number()
         code = f"{self.project.orders_prefix}-{str(next_number).zfill(6)}"
         return code
-    
-    def generate_csv_file(self):
-        """Genera un archivo CSV básico para la orden en C:\test."""
-        file_path = f"\\\\wd02\\Datex\\Import\\CRM_Orders_Import\\Test\\order_{self.lookup_code_order}.csv"
-        with open(file_path, 'w', newline='') as csvfile:
-            writer = csv.writer(csvfile)
-            # Por ahora, escribimos datos básicos; luego ajustaremos las columnas
-            writer.writerow(['lookup_code_order', 'order_type', 'order_status'])
-            writer.writerow([
-                self.lookup_code_order,
-                self.order_type.type_name,
-                self.order_status.status_name
-            ])
-        # Actualizamos los campos file_generated y file_generated_at
-        self.file_generated = True
-        self.file_generated_at = timezone.now()
 
     def save(self, *args, **kwargs):
-        """Sobrescribe el método save para detectar cambios de estado y generar el CSV."""
-        # Si el objeto ya existe en la base de datos, verificamos el cambio de estado
-        if self.pk:
-            old_instance = Order.objects.get(pk=self.pk)
-            old_status_id = old_instance.order_status_id
-            new_status_id = self.order_status_id
-
-            # Si cambia de "Created" (id=1) a "Submitted" (id=2)
-            if old_status_id == 1 and new_status_id == 2:
-                self.generate_csv_file()
-        
         """Genera automáticamente lookup_code_order y lookup_code_shipment si no están definidos."""
         if not self.lookup_code_order or not self.lookup_code_shipment:
             generated_code = self.generate_order_code()
