@@ -160,7 +160,34 @@ python manage.py migrate
 python manage.py createsuperuser
 ```
 
-6. Start the development server:
+6. Create initial Order Statuses:
+
+The following Order Statuses are required for the system to function properly. You can create them through the Django admin interface or by using the database shell:
+
+| ID | Status Name | Description | Lookup Code |
+|----|------------|-------------|-------------|
+| 1 | Created | Order initiated, editable | 01_created |
+| 2 | Submitted | Order sent, not editable by the user | 02_submitted |
+| 3 | Received | Received by the WMS | 03_received |
+| 4 | Processing | In preparation process | 04_processing |
+| 5 | Shipped | Sent to the carrier | 05_shipped |
+| 6 | In Transit | On the way to the destination | 06_in_transit |
+| 7 | Delivered | Delivered to the customer | 07_delivered |
+
+You can use the following SQL to insert these statuses:
+
+```sql
+INSERT INTO orders_orderstatus (id, status_name, description, lookup_code, created_at, updated_at) VALUES
+(1, 'Created', 'Order initiated, editable', '01_created', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(2, 'Submitted', 'Order sent, not editable by the user', '02_submitted', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(3, 'Received', 'Received by the WMS', '03_received', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(4, 'Processing', 'In preparation process', '04_processing', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(5, 'Shipped', 'Sent to the carrier', '05_shipped', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(6, 'In Transit', 'On the way to the destination', '06_in_transit', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(7, 'Delivered', 'Delivered to the customer', '07_delivered', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+```
+
+7. Start the development server:
 ```bash
 python manage.py runserver
 ```
