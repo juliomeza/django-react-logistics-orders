@@ -12,7 +12,56 @@ A complete authentication and order management system using Django REST Framewor
 - Protected routes in both frontend and backend
 - Scalable system architecture
 - CORS configured for local development
-- API endpoints for order management, inventory, logistics, and users
+
+### Core Features
+- Project and client management
+- Multi-warehouse support
+- Carrier and shipping service integration
+- Material tracking with lot numbers
+- Inventory management with location tracking
+- Order processing workflow
+- License plate tracking
+- Price history tracking for materials
+- Inbound and outbound order management
+- Advanced order filtering and search
+- Real-time order status updates
+- Customer and contact management
+- Customizable reports with SQL integration
+- Export capabilities (JSON/CSV)
+
+### Dashboard Features
+- Active orders tracking
+- Recently delivered orders (30-day view)
+- Order status visualization
+- Quick search by order, reference, customer, or destination
+- Separate views for inbound and outbound orders
+- Order action controls (View/Edit/Delete)
+
+### Order Management
+- Multi-step order creation
+- Material selection with quantity management
+- Logistics information handling
+- Shipping and billing address management
+- Order status workflow
+- Order type and class categorization
+- Reference number tracking
+- Notes and additional information support
+
+### Inventory Features
+- Material type categorization
+- Unit of measure (UOM) management
+- Serial number tracking
+- Location management
+- License plate management
+- Lot and vendor lot tracking
+- Available quantity tracking
+
+### Reports Module
+- Custom SQL query execution
+- Predefined report templates
+- Dynamic column handling
+- Multiple export formats
+- Real-time data access
 
 ## Using this Template
 
@@ -149,18 +198,28 @@ The backend provides a set of API endpoints for managing different modules. Belo
 
 - **Enterprise & Clients:**
   - `GET /api/enterprises/` - List enterprises
-  - `GET /api/owners/` - List clients
+  - `GET /api/clients/` - List clients
   - `GET /api/projects/` - List projects
 
 - **Orders & Inventory:**
   - `GET /api/orders/` - List orders
   - `POST /api/orders/` - Create a new order
   - `GET /api/inventories/` - List inventory items
+  - `GET /api/materials/` - List materials
+  - `GET /api/uoms/` - List units of measure
+  - `GET /api/material-types/` - List material types
 
 - **Logistics:**
   - `GET /api/warehouses/` - List warehouses
   - `GET /api/addresses/` - List addresses
   - `GET /api/carriers/` - List carriers
+  - `GET /api/carrier-services/` - List carrier services
+  - `GET /api/contacts/` - List contacts
+
+- **Reports:**
+  - `GET /api/reports/` - List available reports
+  - `POST /api/reports/{id}/execute/` - Execute a predefined report
+  - `POST /api/reports/execute-custom-query/` - Execute a custom SQL query
 
 ## API Documentation (Swagger & Redoc)
 
@@ -190,12 +249,13 @@ The JSON schema can be used for API documentation, integrations, or importing in
 
 The application includes several models that structure the database:
 
-- **Users:** Custom user model with roles and permissions.
-- **Enterprise & Clients:** Enterprises, clients, and projects linked to users.
-- **Orders:** Orders, order lines, and order statuses.
-- **Inventory:** Inventory records with serial numbers and tracking information.
-- **Logistics:** Warehouses, carriers, and addresses.
-- **Materials:** Materials, material types, and unit of measure (UOM).
+- **Users:** Custom user model with roles and permissions
+- **Enterprise & Clients:** Enterprises, clients, and projects linked to users
+- **Orders:** Orders, order lines, order types, order classes, and order statuses
+- **Inventory:** Inventory records with serial numbers, lot tracking, and location management
+- **Logistics:** Warehouses, carriers, carrier services, addresses, and contacts
+- **Materials:** Materials, material types, unit of measure (UOM), and price history
+- **Reports:** Report definitions and configurations
 
 ## License
 
