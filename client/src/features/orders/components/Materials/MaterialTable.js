@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { Delete } from '@mui/icons-material';
 import MaterialSearch from './MaterialSearch';
-import { formatQuantity } from '../utils/MaterialUtils';
+import { formatQuantity } from '../../utils/MaterialUtils';
 
 const MaterialTable = ({ 
   selectedItems, 

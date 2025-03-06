@@ -3,7 +3,7 @@ import { Container, Typography, Snackbar, Alert } from '@mui/material';
 import { useNavigate, Navigate, useParams } from 'react-router-dom';
 import AuthContext from '../../auth/AuthContext';
 import OrderDetailsForm from '../components/OrderDetails/OrderDetailsForm';
-import MaterialSelectionStep from '../components/MaterialSelectionStep';
+import MaterialSelectionStep from '../components/Materials/MaterialSelectionStep';
 import OrderSummary from '../components/OrderSummary';
 import StepperHeader from '../components/StepperHeader';
 import { formReducer, initialFormState } from '../reducers/formReducer';
