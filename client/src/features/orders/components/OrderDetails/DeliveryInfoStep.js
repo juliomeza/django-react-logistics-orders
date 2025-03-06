@@ -3,7 +3,7 @@ import { Paper, Typography, TextField, Autocomplete, Box, Button, Dialog, Dialog
 import Grid from '@mui/material/Grid2';
 import apiProtected from '../../../../services/api/secureApi';
 import { formatDateForInput, formatAddress, buildContactOptions, createCustomFilterOptions } from '../../utils/DeliveryInfoUtils';
-import ContactFormModal from '../ContactFormModal';
+import ContactFormModal from '../Contacts/ContactFormModal';
 
 // Componente de diálogo de advertencia
 const ProjectWarningDialog = ({ open, onClose }) => {
