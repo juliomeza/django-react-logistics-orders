@@ -2,7 +2,7 @@ import React, { useState, useContext, useReducer, useEffect } from 'react';
 import { Container, Typography, Button, Box, Snackbar, Alert } from '@mui/material';
 import { useNavigate, Navigate, useParams } from 'react-router-dom';
 import AuthContext from '../../auth/AuthContext';
-import OrderDetailsStep from '../components/OrderDetailsStep';
+import OrderDetailsForm from '../components/OrderDetailsForm';
 import MaterialSelectionStep from '../components/MaterialSelectionStep';
 import ReviewStep from '../components/ReviewStep';
 import apiProtected from '../../../services/api/secureApi';
@@ -205,7 +205,7 @@ const MultiStepCreateOrder = () => {
     switch (step) {
       case 0:
         return (
-          <OrderDetailsStep
+          <OrderDetailsForm
             formData={formData}
             handleChange={handleChange}
             orderTypes={referenceData.orderTypes}

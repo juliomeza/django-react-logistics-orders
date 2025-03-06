@@ -3,7 +3,7 @@ import { Paper, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import SelectField from './SelectField';
 
-const OrderDetailsLogisticsInformation = ({
+const LogisticsInfoStep = ({
   formData,
   handleChange,
   warehouses = [],
@@ -82,4 +82,4 @@ const OrderDetailsLogisticsInformation = ({
   );
 };
 
-export default OrderDetailsLogisticsInformation;
+export default LogisticsInfoStep;

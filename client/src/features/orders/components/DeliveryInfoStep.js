@@ -4,7 +4,7 @@ import Grid from '@mui/material/Grid2';
 import apiProtected from '../../../services/api/secureApi';
 import { createFilterOptions } from '@mui/material/Autocomplete';
 
-const OrderDetailsDeliveryInformation = ({
+const DeliveryInfoStep = ({
   formData,
   handleChange,
   contacts = [],
@@ -766,4 +766,4 @@ const OrderDetailsDeliveryInformation = ({
   );
 };
 
-export default OrderDetailsDeliveryInformation;
+export default DeliveryInfoStep;

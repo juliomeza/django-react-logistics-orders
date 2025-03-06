@@ -1,10 +1,10 @@
 import React from 'react';
-import OrderDetailsBasicOrderInformation from './OrderDetailsBasicOrderInformation';
-import OrderDetailsLogisticsInformation from './OrderDetailsLogisticsInformation';
-import OrderDetailsDeliveryInformation from './OrderDetailsDeliveryInformation';
-import OrderDetailsAdditionalInformation from './OrderDetailsAdditionalInformation';
+import BasicOrderInfoStep from './BasicOrderInfoStep';
+import LogisticsInfoStep from './LogisticsInfoStep';
+import DeliveryInfoStep from './DeliveryInfoStep';
+import AdditionalInfoStep from './AdditionalInfoStep';
 
-const OrderDetailsStep = ({
+const OrderDetailsForm = ({
   formData,
   handleChange,
   orderTypes,
@@ -18,11 +18,11 @@ const OrderDetailsStep = ({
   formErrors,
   isOrderLocked,
   user,
-  refetchReferenceData, // Nueva prop
+  refetchReferenceData,
 }) => {
   return (
     <>
-      <OrderDetailsBasicOrderInformation
+      <BasicOrderInfoStep
         formData={formData}
         handleChange={handleChange}
         orderTypes={orderTypes}
@@ -30,7 +30,7 @@ const OrderDetailsStep = ({
         formErrors={formErrors}
         isOrderLocked={isOrderLocked}
       />
-      <OrderDetailsLogisticsInformation
+      <LogisticsInfoStep
         formData={formData}
         handleChange={handleChange}
         warehouses={warehouses}
@@ -40,7 +40,7 @@ const OrderDetailsStep = ({
         formErrors={formErrors}
         isOrderLocked={isOrderLocked}
       />
-      <OrderDetailsDeliveryInformation
+      <DeliveryInfoStep
         formData={formData}
         handleChange={handleChange}
         contacts={contacts}
@@ -51,7 +51,7 @@ const OrderDetailsStep = ({
         isOrderLocked={isOrderLocked}
         refetchReferenceData={refetchReferenceData} // Pasamos la función
       />
-      <OrderDetailsAdditionalInformation
+      <AdditionalInfoStep
         formData={formData}
         handleChange={handleChange}
         formErrors={formErrors}
@@ -61,4 +61,4 @@ const OrderDetailsStep = ({
   );
 };
 
-export default OrderDetailsStep;
+export default OrderDetailsForm;
