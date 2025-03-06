@@ -11,9 +11,9 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import AuthContext from '../../auth/AuthContext';
 import apiProtected from '../../../services/api/secureApi';
 import { isWithinLast30Days, filterOrders } from '../utils/DashboardUtils';
-import DashboardFilters from './DashboardFilters';
-import OrdersSection from './OrdersSection';
-import DeleteOrderDialog from './DeleteOrderDialog';
+import DashboardFilters from '../components/DashboardFilters';
+import OrdersSection from '../components/OrdersSection';
+import DeleteOrderDialog from '../components/DeleteOrderDialog';
 import { useTheme } from '@mui/material';
 
 const Dashboard = () => {
