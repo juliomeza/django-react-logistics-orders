@@ -13,7 +13,7 @@ import {
   IconButton 
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { getStatusChipColor, isCreatedStatus } from './DashboardUtils';
+import { getStatusChipColor, isCreatedStatus } from '../utils/DashboardUtils';
 
 const OrdersTable = ({ 
   orders, 

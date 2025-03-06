@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Paper, Typography, TextField, Autocomplete, Box, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import apiProtected from '../../../services/api/secureApi';
-import { formatDateForInput, formatAddress, buildContactOptions, createCustomFilterOptions } from './DeliveryInfoUtils';
+import { formatDateForInput, formatAddress, buildContactOptions, createCustomFilterOptions } from '../utils/DeliveryInfoUtils';
 import ContactFormModal from './ContactFormModal';
 
 // Componente de diálogo de advertencia

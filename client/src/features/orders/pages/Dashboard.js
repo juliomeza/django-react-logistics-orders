@@ -10,7 +10,7 @@ import {
 import { Navigate, useNavigate } from 'react-router-dom';
 import AuthContext from '../../auth/AuthContext';
 import apiProtected from '../../../services/api/secureApi';
-import { isWithinLast30Days, filterOrders } from './DashboardUtils';
+import { isWithinLast30Days, filterOrders } from '../utils/DashboardUtils';
 import DashboardFilters from './DashboardFilters';
 import OrdersSection from './OrdersSection';
 import DeleteOrderDialog from './DeleteOrderDialog';

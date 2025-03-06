@@ -1,5 +1,5 @@
 import apiProtected from '../../../services/api/secureApi';
-import { saveOrderLines, getSubmittedOrderStatus, handleApiError } from '../utils/apiUtils';
+import { saveOrderLines, getSubmittedOrderStatus, handleApiError } from './apiUtils';
 import { prepareOrderData } from './OrderValidation';
 
 // Handle saving order details (step 1)

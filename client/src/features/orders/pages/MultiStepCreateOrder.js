@@ -10,9 +10,9 @@ import { formReducer, initialFormState } from '../reducers/formReducer';
 import useReferenceData from '../hooks/useReferenceData';
 import useInventoriesAndMaterials from '../hooks/useInventoriesAndMaterials';
 import { saveOrderLines } from '../utils/apiUtils';
-import { validateOrderDetails } from './OrderValidation';
+import { validateOrderDetails } from '../utils/OrderValidation';
 import OrderStepActions from './OrderStepActions';
-import { saveOrderDetails, submitOrder, loadOrderData } from './OrderSubmission';
+import { saveOrderDetails, submitOrder, loadOrderData } from '../utils/OrderSubmission';
 
 // Render step content based on current step
 const renderStepContent = (

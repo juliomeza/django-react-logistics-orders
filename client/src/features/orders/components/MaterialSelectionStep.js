@@ -6,7 +6,7 @@ import {
   CircularProgress
 } from '@mui/material';
 import MaterialTable from './MaterialTable';
-import { enrichSelectedItems, createInventoryOptions, validateQuantity } from './MaterialUtils';
+import { enrichSelectedItems, createInventoryOptions, validateQuantity } from '../utils/MaterialUtils';
 
 const MaterialSelectionStep = ({ 
   formData, 
