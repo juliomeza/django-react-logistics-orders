@@ -4,7 +4,7 @@ import { useNavigate, Navigate, useParams } from 'react-router-dom';
 import AuthContext from '../../auth/AuthContext';
 import OrderDetailsForm from '../components/OrderDetailsForm';
 import MaterialSelectionStep from '../components/MaterialSelectionStep';
-import ReviewStep from '../components/ReviewStep';
+import OrderSummary from '../components/OrderSummary';
 import apiProtected from '../../../services/api/secureApi';
 import StepperHeader from '../components/StepperHeader';
 import { formReducer, initialFormState } from '../reducers/formReducer';
@@ -236,18 +236,13 @@ const MultiStepCreateOrder = () => {
         );
       case 2:
         return (
-          <ReviewStep
-            formData={formData}
-            orderTypes={referenceData.orderTypes}
-            orderClasses={referenceData.orderClasses}
-            warehouses={referenceData.warehouses}
-            projects={referenceData.projects}
-            carriers={referenceData.carriers}
-            carrierServices={referenceData.carrierServices}
-            contacts={referenceData.contacts}
-            addresses={referenceData.addresses}
-            materials={inventoriesAndMaterials.materials}
-          />
+        <OrderSummary
+          orderData={formData}
+          referenceData={referenceData}
+          materials={inventoriesAndMaterials.materials}
+          materialItems={formData.selectedInventories}
+          isReviewMode={true}
+        />
         );
       default:
       return null;
