@@ -11,7 +11,7 @@ import useReferenceData from '../hooks/useReferenceData';
 import useInventoriesAndMaterials from '../hooks/useInventoriesAndMaterials';
 import { saveOrderLines } from '../utils/apiUtils';
 import { validateOrderDetails } from '../utils/OrderValidation';
-import OrderStepActions from './OrderStepActions';
+import OrderStepActions from '../components/OrderStepActions';
 import { saveOrderDetails, submitOrder, loadOrderData } from '../utils/OrderSubmission';
 
 // Render step content based on current step
