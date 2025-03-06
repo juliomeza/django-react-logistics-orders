@@ -9,7 +9,6 @@ import {
   TableHead,
   TableRow,
   Divider,
-  useTheme,
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
@@ -30,7 +29,6 @@ const OrderSummary = ({
   materialItems = [],
   isReviewMode = false
 }) => {
-  const theme = useTheme();
   
   // Helper function to display empty values
   const displayValue = (value) => {
@@ -77,7 +75,6 @@ const OrderSummary = ({
   
     const parts = [];
   
-    // Si hay company_name, lo agregamos
     if (item.company_name) {
       parts.push(
         <Typography key="company" variant="body1" component="span">
@@ -86,7 +83,6 @@ const OrderSummary = ({
       );
     }
   
-    // Si hay contact_name, lo agregamos
     if (item.contact_name) {
       if (parts.length > 0) {
         parts.push(
@@ -103,7 +99,6 @@ const OrderSummary = ({
       }
     }
   
-    // Si hay attention, lo agregamos opcionalmente
     if (item.attention) {
       parts.push(
         <Typography key="attention" variant="body2" component="span" color="text.secondary" sx={{ display: 'block' }}>
@@ -112,7 +107,6 @@ const OrderSummary = ({
       );
     }
   
-    // Si no hay nada, mostramos "Not specified"
     if (parts.length === 0) {
       return <Typography variant="body1" style={{ color: 'rgba(0, 0, 0, 0.6)', fontStyle: 'italic' }}>Not specified</Typography>;
     }
@@ -126,11 +120,9 @@ const OrderSummary = ({
     
     const parts = [];
     
-    // Add address lines
     if (item.address_line_1) parts.push(item.address_line_1);
     if (item.address_line_2) parts.push(item.address_line_2);
     
-    // Add city, state and postal code
     const cityStateZip = [];
     if (item.city) cityStateZip.push(item.city);
     if (item.state) cityStateZip.push(item.state);
@@ -140,10 +132,8 @@ const OrderSummary = ({
       parts.push(cityStateZip.join(', '));
     }
     
-    // Add country
     if (item.country) parts.push(item.country);
     
-    // Join all parts with line breaks
     return parts.map((part, index) => (
       <React.Fragment key={index}>
         {part}
@@ -159,16 +149,6 @@ const OrderSummary = ({
 
   // Check if materials are selected
   const hasMaterials = materialItems && materialItems.length > 0;
-
-  // Estilo para el número de orden destacado
-  const orderNumberStyle = {
-    color: theme.palette.primary.main,
-    fontWeight: 600,
-    padding: '3px 8px',
-    borderRadius: '4px',
-    backgroundColor: theme.palette.status.inProgress.backgroundColor,
-    display: 'inline-block',
-  };
 
   return (
     <>
@@ -191,10 +171,8 @@ const OrderSummary = ({
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Typography variant="body2" color="text.secondary">Order Number</Typography>
-            <Typography variant="body1">
-              <span style={orderNumberStyle}>
-                {orderData.lookup_code_order}
-              </span>
+            <Typography variant="body1" className="order-number">
+              {orderData.lookup_code_order}
             </Typography>
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
