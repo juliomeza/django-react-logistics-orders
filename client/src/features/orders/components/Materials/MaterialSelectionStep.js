@@ -13,7 +13,8 @@ const MaterialSelectionStep = ({
   setFormData, 
   inventories = [], 
   materials = [],
-  loading = false
+  loading = false,
+  materialUoms = {} // Objeto que mapea materialId a array de UOMs disponibles
 }) => {
   const [selectedItems, setSelectedItems] = useState(formData.selectedInventories || []);
   const [currentSelection, setCurrentSelection] = useState(null);
@@ -44,7 +45,8 @@ const MaterialSelectionStep = ({
     // Add new item with default quantity of 1
     const newItem = { 
       ...selectedOption, 
-      orderQuantity: 1
+      orderQuantity: 1,
+      uom: selectedOption.uom || materials.find(m => m.id === selectedOption.material)?.uom || 1
     };
     
     const updatedItems = [...selectedItems, newItem];
@@ -76,6 +78,18 @@ const MaterialSelectionStep = ({
     setFormData(newSelectedItems);
   };
 
+  // Handle UOM change for selected items
+  const handleUomChange = (itemId, newUomId) => {
+    const newSelectedItems = selectedItems.map(selectedItem => 
+      selectedItem.id === itemId 
+        ? { ...selectedItem, uom: newUomId }
+        : selectedItem
+    );
+    
+    setSelectedItems(newSelectedItems);
+    setFormData(newSelectedItems);
+  };
+
   return (
     <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
       <Typography variant="subtitle1" sx={{ mb: 2 }}>
@@ -93,6 +107,7 @@ const MaterialSelectionStep = ({
             selectedItems={selectedItems}
             materials={materials}
             handleQuantityChange={handleQuantityChange}
+            handleUomChange={handleUomChange}
             handleRemoveItem={handleRemoveItem}
             availableOptions={availableOptions}
             currentSelection={currentSelection}
@@ -100,6 +115,7 @@ const MaterialSelectionStep = ({
             setInputValue={setInputValue}
             handleAddItem={handleAddItem}
             setCurrentSelection={setCurrentSelection}
+            materialUoms={materialUoms}
           />
           
           {/* Selected items count */}

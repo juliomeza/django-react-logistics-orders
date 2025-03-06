@@ -27,7 +27,7 @@ const MaterialSearch = ({
           renderInput={(params) => (
             <TextField 
               {...params} 
-              placeholder="Search material by code or name..."
+              placeholder="Search by code or name"
               size="small"
             />
           )}

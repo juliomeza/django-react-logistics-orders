@@ -18,13 +18,15 @@ const MaterialTable = ({
   selectedItems, 
   materials, 
   handleQuantityChange, 
+  handleUomChange,
   handleRemoveItem, 
   availableOptions,
   currentSelection,
   inputValue,
   setInputValue,
   handleAddItem,
-  setCurrentSelection
+  setCurrentSelection,
+  materialUoms = {} // Objeto que mapea materialId a array de UOMs disponibles
 }) => {
   return (
     <TableContainer sx={{ mb: 3 }}>
@@ -32,9 +34,10 @@ const MaterialTable = ({
         <TableHead>
           <TableRow>
             <TableCell>Material Code</TableCell>
-            <TableCell width="40%">Material Name</TableCell>
+            <TableCell width="30%">Material Name</TableCell>
             <TableCell align="right">Available Qty</TableCell>
             <TableCell>Order Qty</TableCell>
+            <TableCell align="center">UOM</TableCell>
             <TableCell align="center">Actions</TableCell>
           </TableRow>
         </TableHead>
@@ -71,6 +74,27 @@ const MaterialTable = ({
                   />
                 </TableCell>
                 <TableCell align="center">
+                  <TextField
+                    select
+                    size="small"
+                    value={item.uom || material?.uom || ''}
+                    onChange={(e) => {
+                      handleUomChange && handleUomChange(item.id, e.target.value);
+                    }}
+                    SelectProps={{
+                      native: true,
+                    }}
+                    sx={{ width: '120px' }}
+                  >
+                    {materialUoms[material?.id] ? 
+                      materialUoms[material?.id].map(uom => (
+                        <option key={uom.id} value={uom.id}>{uom.name}</option>
+                      )) : 
+                      <option value="1">Each</option>
+                    }
+                  </TextField>
+                </TableCell>
+                <TableCell align="center">
                   <IconButton 
                     size="small" 
                     color="error"
@@ -95,7 +119,7 @@ const MaterialTable = ({
           {/* Empty state messages */}
           {selectedItems.length === 0 && availableOptions.length > 0 && (
             <TableRow>
-              <TableCell colSpan={5} align="center" sx={{ py: 2 }}>
+              <TableCell colSpan={6} align="center" sx={{ py: 2 }}>
                 <Typography variant="body2" color="text.secondary">
                   Search and select materials to add to your order
                 </Typography>
@@ -105,7 +129,7 @@ const MaterialTable = ({
           
           {availableOptions.length === 0 && selectedItems.length === 0 && (
             <TableRow>
-              <TableCell colSpan={5} align="center" sx={{ py: 2 }}>
+              <TableCell colSpan={6} align="center" sx={{ py: 2 }}>
                 <Typography variant="body2" color="text.secondary">
                   No inventory items available
                 </Typography>
