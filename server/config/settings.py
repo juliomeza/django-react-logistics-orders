@@ -141,6 +141,8 @@ REST_FRAMEWORK = {
     ),
 }
 
+# ⚠️ ACCESS_TOKEN_LIFETIME debe ser mayor que el refresh en frontend
+# Actualmente 20 min → El frontend renueva a los 19 min (ver authApi.js)
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=20),  # Tiempo de vida del access token
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),  # Tiempo de vida del refresh token

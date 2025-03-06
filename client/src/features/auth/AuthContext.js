@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api, { setupInterceptors } from '../../services/api/authApi';
+import api, { setupInterceptors, clearTokenRefresh, setupTokenRefresh } from '../../services/api/authApi';
 import apiProtected from '../../services/api/secureApi';
 
 const AuthContext = createContext();
@@ -13,9 +13,15 @@ export const AuthProvider = ({ children }) => {
   const checkAuthStatus = async () => {
     try {
       const response = await api.get('auth-status/');
-      setUser(response.data.user ? { ...response.data.user } : null);
+      const userData = response.data.user;
+      setUser(userData ? { ...userData } : null);
+      // Si hay un usuario, configuramos el refresh token
+      if (userData) {
+        setupTokenRefresh();
+      }
     } catch (error) {
       setUser(null);
+      clearTokenRefresh();
     } finally {
       setLoading(false);
     }
@@ -46,6 +52,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
+      clearTokenRefresh();
       await api.post('logout/');
       setUser(null);
       navigate('/login');
