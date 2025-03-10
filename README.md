@@ -79,7 +79,7 @@ cd your-project-name
 
 3. Remove the existing git repository and initialize a new one:
 ```bash
-rm -rf .git
+rm -rf .git # On Windows: Remove-Item -Recurse -Force .git
 git init
 ```
 
@@ -102,6 +102,7 @@ git remote -v
 ```bash
 git add .
 git commit -m "First commit"
+git branch -M main
 ```
 
 8. Push the changes to the new repository:
@@ -177,7 +178,7 @@ The following Order Statuses are required for the system to function properly. Y
 You can use the following SQL to insert these statuses:
 
 ```sql
-INSERT INTO orders_orderstatus (id, status_name, description, lookup_code, created_at, updated_at) VALUES
+INSERT INTO orders_orderstatus (id, status_name, description, lookup_code, created_date, modified_date) VALUES
 (1, 'Created', 'Order initiated, editable', '01_created', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (2, 'Submitted', 'Order sent, not editable by the user', '02_submitted', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (3, 'Received', 'Received by the WMS', '03_received', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
