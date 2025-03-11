@@ -45,6 +45,12 @@ class Project(TimeStampedModel):
         ('CSV', 'CSV File')
     ]
 
+    INVENTORY_SELECTION_CHOICES = [
+        ('MATERIAL', 'Material Only'),
+        ('MATERIAL_LOT', 'Material and Lot'),
+        ('MATERIAL_LOT_LP', 'Material, Lot and License Plate')
+    ]
+
     is_active = models.BooleanField(default=True)
     name = models.CharField(max_length=100)
     lookup_code = models.CharField(max_length=50, unique=True)
@@ -71,6 +77,12 @@ class Project(TimeStampedModel):
         choices=EXPORT_FORMAT_CHOICES,
         default='JSON',
         help_text="Export format for orders"
+    )
+    inventory_selection_type = models.CharField(
+        max_length=15,
+        choices=INVENTORY_SELECTION_CHOICES,
+        default='MATERIAL',
+        help_text="Determine how inventory is selected when creating orders"
     )
     notes = models.TextField(blank=True)
 
